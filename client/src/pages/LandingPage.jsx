@@ -268,7 +268,7 @@ const LandingPage = () => {
       </section>
 
       {/* Features */}
-      <section style={{ padding: '100px 24px', position: 'relative', zIndex: 1 }}>
+      <section id="features" style={{ padding: '100px 24px', position: 'relative', zIndex: 1 }}>
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
             <h2 style={{ fontSize: '2.5rem' }}>Everything you need. <span style={{ color: 'var(--text-dim)' }}>Nothing you don't.</span></h2>
@@ -296,7 +296,7 @@ const LandingPage = () => {
       </section>
 
       {/* Pricing */}
-      <section style={{ padding: '100px 24px', background: 'rgba(255,255,255,0.01)', borderTop: '1px solid var(--border)', position: 'relative', zIndex: 1 }}>
+      <section id="pricing" style={{ padding: '100px 24px', background: 'rgba(255,255,255,0.01)', borderTop: '1px solid var(--border)', position: 'relative', zIndex: 1 }}>
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
             <h2 style={{ fontSize: '2.5rem' }}>Simple, Honest Pricing</h2>
