@@ -1,20 +1,15 @@
 import { Navigate } from 'react-router-dom';
-import useAuthStore from '../../store/authStore';
+import api from '../../services/api';
 
 const AdminGuard = ({ children }) => {
-  const { isAuthenticated, isLoading, user } = useAuthStore();
+  const adminToken = localStorage.getItem('adminToken');
 
-  if (isLoading) {
-    return (
-      <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: 'var(--text-dim)' }}>Loading...</p>
-      </div>
-    );
+  if (!adminToken) {
+    return <Navigate to="/super-admin-secret-dashboard/login" replace />;
   }
 
-  if (!isAuthenticated || !user?.isAdmin) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  // Set the authorization header specifically for this admin page to use the admin token
+  api.defaults.headers.common['Authorization'] = `Bearer ${adminToken}`;
 
   return children;
 };

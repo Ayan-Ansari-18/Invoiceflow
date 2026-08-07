@@ -1,5 +1,22 @@
 const User = require('../models/User');
 const Invoice = require('../models/Invoice');
+const jwt = require('jsonwebtoken');
+
+// POST /api/admin/login
+const loginAdmin = async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
+    
+    if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
+      const adminToken = jwt.sign({ role: 'superadmin' }, process.env.JWT_SECRET, { expiresIn: '1d' });
+      return res.json({ success: true, adminToken });
+    }
+    
+    return res.status(401).json({ success: false, message: 'Invalid admin credentials' });
+  } catch (err) {
+    next(err);
+  }
+};
 
 // GET /api/admin/stats
 const getStats = async (req, res, next) => {
@@ -82,6 +99,7 @@ const deleteUser = async (req, res, next) => {
 };
 
 module.exports = {
+  loginAdmin,
   getStats,
   getUsers,
   toggleBanUser,

@@ -24,6 +24,7 @@ import BrandingPage from './pages/BrandingPage';
 import ClientGroupsPage from './pages/ClientGroupsPage';
 import OnboardingPage from './pages/OnboardingPage';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminLogin from './pages/AdminLogin';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -66,6 +67,7 @@ const App = () => {
           <Route path="/branding" element={<OnboardingGuard><BrandingPage /></OnboardingGuard>} />
           <Route path="/client-groups" element={<OnboardingGuard><ClientGroupsPage /></OnboardingGuard>} />
           {/* Hidden Admin Route */}
+          <Route path="/super-admin-secret-dashboard/login" element={<AdminLogin />} />
           <Route path="/super-admin-secret-dashboard" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
 
           {/* Catch All */}
