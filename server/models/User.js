@@ -75,6 +75,14 @@ const userSchema = new mongoose.Schema(
       enum: ['free', 'pro', 'business'],
       default: 'free',
     },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+    isBanned: {
+      type: Boolean,
+      default: false,
+    },
     // Gmail OAuth tokens
     gmailAccessToken: { type: String, default: null, select: false },
     gmailRefreshToken: { type: String, default: null, select: false },

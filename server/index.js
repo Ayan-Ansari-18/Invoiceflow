@@ -10,6 +10,7 @@ const authRoutes = require('./routes/auth');
 const invoiceRoutes = require('./routes/invoices');
 const clientRoutes = require('./routes/clients');
 const emailRoutes = require('./routes/email');
+const adminRoutes = require('./routes/admin');
 const { gmailCallback } = require('./controllers/emailController');
 const { errorHandler } = require('./middleware/errorHandler');
 
@@ -44,6 +45,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/email', emailRoutes);
+app.use('/api/admin', adminRoutes);
 // Gmail OAuth callback (no auth middleware — Google redirects here)
 app.get('/api/auth/gmail/callback', gmailCallback);
 

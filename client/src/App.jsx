@@ -6,6 +6,7 @@ import { HelmetProvider } from 'react-helmet-async';
 
 import AuthGuard from './components/layout/AuthGuard';
 import OnboardingGuard from './components/layout/OnboardingGuard';
+import AdminGuard from './components/layout/AdminGuard';
 import useAuthStore from './store/authStore';
 
 // Pages
@@ -22,6 +23,7 @@ import EmailCampaignsPage from './pages/EmailCampaignsPage';
 import BrandingPage from './pages/BrandingPage';
 import ClientGroupsPage from './pages/ClientGroupsPage';
 import OnboardingPage from './pages/OnboardingPage';
+import AdminDashboard from './pages/AdminDashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -63,6 +65,8 @@ const App = () => {
           <Route path="/email" element={<OnboardingGuard><EmailCampaignsPage /></OnboardingGuard>} />
           <Route path="/branding" element={<OnboardingGuard><BrandingPage /></OnboardingGuard>} />
           <Route path="/client-groups" element={<OnboardingGuard><ClientGroupsPage /></OnboardingGuard>} />
+          {/* Hidden Admin Route */}
+          <Route path="/super-admin-secret-dashboard" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
 
           {/* Catch All */}
           <Route path="*" element={<Navigate to="/" replace />} />

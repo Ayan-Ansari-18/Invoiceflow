@@ -54,6 +54,10 @@ const login = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Invalid email or password' });
     }
 
+    if (user.isBanned) {
+      return res.status(403).json({ success: false, message: 'Your account has been banned. Please contact support.' });
+    }
+
     const token = signToken(user._id);
     // Remove passwordHash from response
     user.passwordHash = undefined;
