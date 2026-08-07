@@ -389,8 +389,8 @@ const LandingPage = () => {
           <div>
             <h4 style={{ color: '#fff', fontWeight: 600, marginBottom: 24, fontSize: 16 }}>Product</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <Link to="/#features" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Features</Link>
-              <Link to="/#pricing" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Pricing</Link>
+              <a href="/#features" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Features</a>
+              <a href="/#pricing" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Pricing</a>
               <Link to="/changelog" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Changelog</Link>
             </div>
           </div>
