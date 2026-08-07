@@ -1,5 +1,5 @@
 const express = require('express');
-const { requireAuth } = require('../middleware/requireAuth');
+const { protect } = require('../middleware/auth');
 const { requireAdmin } = require('../middleware/adminAuth');
 const {
   getStats,
@@ -12,7 +12,7 @@ const {
 const router = express.Router();
 
 // All routes require authentication and admin privileges
-router.use(requireAuth, requireAdmin);
+router.use(protect, requireAdmin);
 
 router.get('/stats', getStats);
 router.get('/users', getUsers);

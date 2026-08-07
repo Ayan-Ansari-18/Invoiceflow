@@ -37,7 +37,11 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // ─── Data Sanitization against NoSQL query injection ──────────────────────────
-app.use(mongoSanitize());
+app.use((req, res, next) => {
+  mongoSanitize.sanitize(req.body, { replaceWith: '_' });
+  mongoSanitize.sanitize(req.params, { replaceWith: '_' });
+  next();
+});
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
