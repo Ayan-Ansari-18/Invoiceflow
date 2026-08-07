@@ -356,29 +356,84 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* Premium Footer */}
       <footer style={{
-        borderTop: '1px solid var(--border)',
-        padding: '32px 32px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: 12,
-        background: '#000'
+        borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+        padding: '80px 5% 32px 5%',
+        background: '#040914',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{
-            width: 24, height: 24, borderRadius: 6,
-            background: 'linear-gradient(135deg, #4F46E5, #9333EA)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <Zap size={12} color="#fff" />
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '48px',
+          marginBottom: '64px',
+          maxWidth: '1200px',
+          margin: '0 auto 64px auto'
+        }}>
+          {/* Brand Column */}
+          <div style={{ gridColumn: '1 / -1', '@media (min-width: 768px)': { gridColumn: 'span 2' } }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <img
+                src="/company-logo.png"
+                alt="InvoiceFlow Logo"
+                style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 8 }}
+              />
+              <span style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px' }}>InvoiceFlow</span>
+            </div>
+            <p style={{ color: 'var(--text-dim)', fontSize: 15, lineHeight: 1.6, marginBottom: 24, maxWidth: 320 }}>
+              The ultimate invoicing and client management solution built exclusively for Indian freelancers. Fast, secure, and beautifully designed.
+            </p>
           </div>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>InvoiceFlow</span>
+
+          {/* Links Columns */}
+          <div>
+            <h4 style={{ color: '#fff', fontWeight: 600, marginBottom: 24, fontSize: 16 }}>Product</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <a href="#features" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Features</a>
+              <a href="#pricing" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Pricing</a>
+              <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Changelog</a>
+            </div>
+          </div>
+
+          <div>
+            <h4 style={{ color: '#fff', fontWeight: 600, marginBottom: 24, fontSize: 16 }}>Resources</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Documentation</a>
+              <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Blog</a>
+              <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Community</a>
+            </div>
+          </div>
+
+          <div>
+            <h4 style={{ color: '#fff', fontWeight: 600, marginBottom: 24, fontSize: 16 }}>Legal</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Privacy Policy</a>
+              <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Terms of Service</a>
+              <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Refund Policy</a>
+            </div>
+          </div>
         </div>
-        <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>
-          © 2026 InvoiceFlow. Engineered for excellence.
+
+        {/* Bottom Bar */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 16,
+          paddingTop: 32,
+          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+          maxWidth: '1200px',
+          margin: '0 auto'
+        }}>
+          <div style={{ fontSize: 14, color: 'var(--text-dim)' }}>
+            © {new Date().getFullYear()} InvoiceFlow. Engineered for excellence.
+          </div>
+          <div style={{ display: 'flex', gap: 24 }}>
+            <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>Twitter</a>
+            <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>LinkedIn</a>
+            <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>GitHub</a>
+          </div>
         </div>
       </footer>
     </div>
