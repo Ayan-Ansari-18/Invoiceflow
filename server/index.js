@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('express-mongo-sanitize');
 
 const authRoutes = require('./routes/auth');
 const invoiceRoutes = require('./routes/invoices');
@@ -33,6 +34,9 @@ app.use('/api/auth', authLimiter);
 // ─── Body Parsing ──────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// ─── Data Sanitization against NoSQL query injection ──────────────────────────
+app.use(mongoSanitize());
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
