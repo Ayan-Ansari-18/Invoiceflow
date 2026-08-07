@@ -81,10 +81,6 @@ const DashboardPage = () => {
             <Link to="/invoices" className="btn btn-secondary" style={{ padding: '12px 28px', fontSize: 15 }}>
               Go to Invoices
             </Link>
-          </div>
-          <p style={{ fontSize: 12, color: '#64748b', marginTop: 20 }}>
-            (Click "Upgrade" to test the fake Razorpay flow)
-          </p>
         </div>
       ) : (
         /* ---- Pro users: full dashboard ---- */
