@@ -101,7 +101,7 @@ const ForgotPasswordPage = () => {
               className={`btn btn-primary btn-full btn-lg ${status === 'loading' ? 'btn-loading' : ''}`}
               style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
             >
-              {!status === 'loading' && (
+              {status !== 'loading' && (
                 <>
                   Send reset link
                   <ArrowRight size={18} />

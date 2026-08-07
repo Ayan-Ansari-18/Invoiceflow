@@ -135,7 +135,7 @@ const ResetPasswordPage = () => {
               className={`btn btn-primary btn-full btn-lg ${status === 'loading' ? 'btn-loading' : ''}`}
               style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', marginTop: '24px' }}
             >
-              {!status === 'loading' && (
+              {status !== 'loading' && (
                 <>
                   Reset Password
                   <ArrowRight size={18} />
