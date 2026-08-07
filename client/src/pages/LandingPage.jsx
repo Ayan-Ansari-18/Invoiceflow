@@ -1,4 +1,5 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Zap, FileText, Mail, BarChart2, Shield, Smartphone,
@@ -64,6 +65,19 @@ const PLANS = [
 const LandingPage = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.substring(1);
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 0);
+    }
+  }, [location.hash]);
 
   return (
     <div className="landing" style={{ position: 'relative', overflow: 'hidden' }}>
