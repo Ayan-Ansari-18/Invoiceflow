@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, ArrowRight, Loader2, CheckCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import SEO from '../components/ui/SEO';
 import api from '../services/api';
 
 const ForgotPasswordPage = () => {
@@ -24,97 +26,97 @@ const ForgotPasswordPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-inter">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Link to="/" className="flex items-center justify-center gap-2 mb-6">
-          <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
-            <span className="text-white font-bold text-xl">IF</span>
+    <div className="auth-page">
+      <SEO title="Forgot Password" />
+      <motion.div 
+        className="auth-card"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+      >
+        {/* Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28, justifyContent: 'center' }}>
+          <img
+            src="/company-logo.png"
+            alt="Company Logo"
+            style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 8 }}
+          />
+          <div style={{ textAlign: 'left' }}>
+            <div className="auth-logo" style={{ marginBottom: 0 }}>InvoiceFlow</div>
+            <div className="auth-tagline" style={{ marginBottom: 0 }}>For Indian Freelancers</div>
           </div>
-          <span className="text-2xl font-bold text-gray-900 tracking-tight">InvoiceFlow</span>
-        </Link>
-        <h2 className="text-center text-3xl font-extrabold text-gray-900 mb-2">
-          Forgot your password?
-        </h2>
-        <p className="text-center text-sm text-gray-600">
-          Enter your email address and we'll send you a link to reset your password.
-        </p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-xl shadow-gray-200/50 sm:rounded-2xl sm:px-10 border border-gray-100">
-          {status === 'success' ? (
-            <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
-                <CheckCircle className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Check your inbox</h3>
-              <p className="text-sm text-gray-500 mb-6">
-                {message}
-              </p>
-              <Link
-                to="/login"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
-              >
-                Back to Login
-              </Link>
-            </div>
-          ) : (
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Email address
-                </label>
-                <div className="mt-2 relative rounded-xl shadow-sm">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className={`block w-full pl-10 pr-3 py-3 border ${
-                      status === 'error' ? 'border-red-300' : 'border-gray-200'
-                    } rounded-xl focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors`}
-                    placeholder="you@example.com"
-                  />
-                </div>
-                {status === 'error' && (
-                  <p className="mt-2 text-sm text-red-600" id="email-error">
-                    {message}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <button
-                  type="submit"
-                  disabled={status === 'loading'}
-                  className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  {status === 'loading' ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    <>
-                      Send reset link
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </>
-                  )}
-                </button>
-              </div>
-
-              <div className="text-center mt-4">
-                <Link to="/login" className="font-medium text-sm text-indigo-600 hover:text-indigo-500">
-                  Wait, I remember my password
-                </Link>
-              </div>
-            </form>
-          )}
         </div>
-      </div>
+
+        <h2 className="auth-title">Forgot your password?</h2>
+        <p className="auth-subtitle">Enter your email address and we'll send you a link to reset your password.</p>
+
+        {status === 'success' ? (
+          <div style={{ textAlign: 'center', marginTop: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
+              <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '16px', borderRadius: '50%' }}>
+                <CheckCircle size={32} color="#10B981" />
+              </div>
+            </div>
+            <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>Check your inbox</h3>
+            <p style={{ color: 'var(--text-dim)', marginBottom: '24px', fontSize: '14px' }}>
+              {message}
+            </p>
+            <Link
+              to="/login"
+              className="btn btn-primary btn-full btn-lg"
+              style={{ display: 'inline-flex', justifyContent: 'center', textDecoration: 'none' }}
+            >
+              Back to Login
+            </Link>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} style={{ marginTop: '20px' }}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="email">Email Address</label>
+              <div style={{ position: 'relative' }}>
+                <div style={{ position: 'absolute', inset: '0 0 0 12px', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
+                  <Mail size={18} color="var(--text-dim)" />
+                </div>
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={`form-input ${status === 'error' ? 'error' : ''}`}
+                  placeholder="you@example.com"
+                  style={{ paddingLeft: '40px' }}
+                />
+              </div>
+              {status === 'error' && (
+                <p className="form-error" style={{ marginTop: '8px' }}>
+                  {message}
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={status === 'loading'}
+              className={`btn btn-primary btn-full btn-lg ${status === 'loading' ? 'btn-loading' : ''}`}
+              style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+            >
+              {!status === 'loading' && (
+                <>
+                  Send reset link
+                  <ArrowRight size={18} />
+                </>
+              )}
+            </button>
+
+            <p className="auth-footer" style={{ marginTop: '24px' }}>
+              <Link to="/login" style={{ color: 'var(--primary-light)', fontWeight: 600 }}>
+                Wait, I remember my password
+              </Link>
+            </p>
+          </form>
+        )}
+      </motion.div>
     </div>
   );
 };
