@@ -3,7 +3,7 @@ import axios from 'axios';
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'https://invoiceflow-pue2.onrender.com/api',
   headers: { 'Content-Type': 'application/json' },
-  timeout: 30000,
+  timeout: 100000, // 100 seconds to allow Render free tier to wake up
 });
 
 // Request interceptor — attach token from storage if not already set
