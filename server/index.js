@@ -20,7 +20,10 @@ const app = express();
 app.use(helmet({ contentSecurityPolicy: false })); // CSP off for PDF endpoint
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: function (origin, callback) {
+      // Allow any origin temporarily to fix CORS block
+      callback(null, true);
+    },
     credentials: true,
   })
 );
