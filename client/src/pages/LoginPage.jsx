@@ -14,6 +14,8 @@ import { getErrorMessage } from '../utils/helpers';
 const schema = z.object({
   email: z.string().email('Please enter a valid email'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
+  website_url: z.string().optional(),
+
 });
 
 const LoginPage = () => {
@@ -27,7 +29,8 @@ const LoginPage = () => {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = async ({ email, password }) => {
+  const onSubmit = async ({ email, password, website_url }) => {
+    if (website_url) return; // Honeypot trap: if filled, quietly do nothing (bot detected)
     setIsLoading(true);
     try {
       await login({ email, password });
@@ -116,6 +119,12 @@ const LoginPage = () => {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Honeypot Field */}
+          <div style={{ display: 'none' }} aria-hidden="true">
+            <label htmlFor="website_url">Website URL</label>
+            <input type="text" id="website_url" name="website_url" tabIndex="-1" autoComplete="off" {...register('website_url')} />
+          </div>
+
           <div className="form-group">
             <label className="form-label">Email Address</label>
             <input

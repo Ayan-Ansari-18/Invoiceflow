@@ -16,6 +16,8 @@ const schema = z.object({
   email: z.string().email('Please enter a valid email'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string(),
+  website_url: z.string().optional(),
+
 }).refine((d) => d.password === d.confirmPassword, {
   message: 'Passwords do not match',
   path: ['confirmPassword'],
@@ -32,7 +34,8 @@ const RegisterPage = () => {
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = async ({ name, email, password }) => {
+  const onSubmit = async ({ name, email, password, website_url }) => {
+    if (website_url) return; // Honeypot trap: if filled, quietly do nothing (bot detected)
     setIsLoading(true);
     try {
       await register_({ name, email, password });
@@ -121,6 +124,12 @@ const RegisterPage = () => {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Honeypot Field */}
+          <div style={{ display: 'none' }} aria-hidden="true">
+            <label htmlFor="website_url">Website URL</label>
+            <input type="text" id="website_url" name="website_url" tabIndex="-1" autoComplete="off" {...register('website_url')} />
+          </div>
+
           <div className="form-group">
             <label className="form-label">Full Name</label>
             <input
