@@ -88,6 +88,9 @@ const userSchema = new mongoose.Schema(
     gmailRefreshToken: { type: String, default: null, select: false },
     gmailConnected: { type: Boolean, default: false },
     gmailEmail: { type: String, default: null },
+    // Password Reset
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
   },
   { timestamps: true }
 );

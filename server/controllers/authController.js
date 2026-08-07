@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
+const crypto = require('crypto');
 const emailValidator = require('deep-email-validator');
 const User = require('../models/User');
 
@@ -147,4 +148,66 @@ const googleAuth = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login, getMe, updateProfile, upgradePlan, googleAuth };
+// POST /api/auth/forgotpassword
+const forgotPassword = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'There is no user with that email' });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(20).toString('hex');
+    
+    // Hash token and set to resetPasswordToken field
+    user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    
+    // Set expire to 10 minutes
+    user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+    
+    await user.save({ validateBeforeSave: false });
+
+    // Create reset URL
+    const resetUrl = `${process.env.CLIENT_URL || 'https://getinvoiceflow.online'}/reset-password/${resetToken}`;
+
+    // For now, since we don't have SMTP configured, we just log it to the server console.
+    // In production with SMTP, we would send this via email.
+    console.log(`\n\n=== PASSWORD RESET LINK ===\nUser: ${user.email}\nLink: ${resetUrl}\n===========================\n\n`);
+
+    res.status(200).json({ success: true, message: 'Password reset link sent! Check server logs if email is not configured.' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// PUT /api/auth/resetpassword/:resettoken
+const resetPassword = async (req, res, next) => {
+  try {
+    // Get hashed token
+    const resetPasswordToken = crypto.createHash('sha256').update(req.params.resettoken).digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired token' });
+    }
+
+    // Set new password
+    user.passwordHash = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    
+    await user.save();
+    
+    const token = signToken(user._id);
+
+    res.status(200).json({ success: true, token, user });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { register, login, getMe, updateProfile, upgradePlan, googleAuth, forgotPassword, resetPassword };
