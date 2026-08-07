@@ -407,9 +407,9 @@ const LandingPage = () => {
           <div>
             <h4 style={{ color: '#fff', fontWeight: 600, marginBottom: 24, fontSize: 16 }}>Legal</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Privacy Policy</a>
-              <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Terms of Service</a>
-              <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Refund Policy</a>
+              <Link to="/privacy" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Privacy Policy</Link>
+              <Link to="/terms" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Terms of Service</Link>
+              <Link to="/refund" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Refund Policy</Link>
             </div>
           </div>
         </div>

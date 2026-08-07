@@ -27,6 +27,9 @@ import ClientGroupsPage from './pages/ClientGroupsPage';
 import OnboardingPage from './pages/OnboardingPage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/TermsOfServicePage';
+import RefundPolicyPage from './pages/RefundPolicyPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -52,6 +55,9 @@ const App = () => {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms" element={<TermsOfServicePage />} />
+          <Route path="/refund" element={<RefundPolicyPage />} />
 
           {/* Protected & Onboarding */}
           <Route path="/onboarding" element={<AuthGuard><OnboardingPage /></AuthGuard>} />
