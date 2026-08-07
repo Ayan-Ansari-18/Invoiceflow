@@ -55,7 +55,7 @@ const PLANS = [
     price: '₹299',
     period: '/month',
     badge: 'Most Popular',
-    features: ['Unlimited invoices', 'Email sending', 'Dashboard & analytics', 'Client management', 'Custom branding', 'Multi-currency'],
+    features: ['Unlimited invoices', 'Email sending', 'Dashboard & analytics', 'Client management', 'Custom branding', 'Multi-currency', 'GST calculation'],
     cta: 'Get Pro',
     variant: 'btn-primary',
   },
