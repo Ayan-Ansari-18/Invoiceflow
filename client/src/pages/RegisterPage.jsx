@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
-import { GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import SEO from '../components/ui/SEO';
@@ -50,7 +50,7 @@ const RegisterPage = () => {
   const handleGoogleSuccess = async (credentialResponse) => {
     setIsLoading(true);
     try {
-      await googleLogin(credentialResponse.credential);
+      await googleLogin(credentialResponse.access_token);
       localStorage.removeItem('invoiceFlow_isPro');
       window.dispatchEvent(new Event('subscriptionChange'));
       toast.success('Signed in with Google!');
@@ -61,6 +61,11 @@ const RegisterPage = () => {
       setIsLoading(false);
     }
   };
+
+  const performGoogleLogin = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: () => toast.error('Google Sign-In failed'),
+  });
 
   return (
     <div className="auth-page">
@@ -88,17 +93,25 @@ const RegisterPage = () => {
         <p className="auth-subtitle">Free forever · No credit card required</p>
 
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={() => {
-              toast.error('Google Sign-In failed');
+          <button 
+            type="button"
+            onClick={() => performGoogleLogin()}
+            className="btn btn-secondary btn-full btn-lg"
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              gap: 12,
+              background: '#fff',
+              color: '#000',
+              border: 'none',
+              fontWeight: 600,
+              fontSize: 15
             }}
-            useOneTap
-            shape="rectangular"
-            theme="outline"
-            text="signup_with"
-            width="100%"
-          />
+          >
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style={{ width: 20, height: 20 }} />
+            Continue with Google
+          </button>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '20px 0', color: 'var(--text-dim)' }}>

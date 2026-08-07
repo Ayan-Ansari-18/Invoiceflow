@@ -46,7 +46,7 @@ const PLANS = [
     price: '₹0',
     period: '/month',
     badge: null,
-    features: ['5 invoices/month', 'PDF download', 'GST calculation', 'INR currency'],
+    features: ['5 invoices/month', 'PDF download', 'INR currency'],
     cta: 'Start Free',
     variant: 'btn-secondary',
   },

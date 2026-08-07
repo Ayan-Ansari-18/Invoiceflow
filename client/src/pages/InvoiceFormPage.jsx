@@ -537,29 +537,22 @@ const InvoiceFormPage = () => {
                 <div className="form-group" style={{ marginBottom: 0 }}>
                   <label className="form-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     GST Rate
-                    {!isPro && watched?.clientSnapshot?.country === 'India' && <span style={{ fontSize: 10, background: 'rgba(79,70,229,0.1)', color: '#6366f1', padding: '2px 6px', borderRadius: 4, display: 'flex', alignItems: 'center', gap: 4 }}><Lock size={10} /> Pro Feature</span>}
                   </label>
                   <select 
                     {...register('gstPercent')} 
                     className="form-select"
-                    disabled={!isPro || watched?.clientSnapshot?.country !== 'India'}
-                    style={{ opacity: (!isPro || watched?.clientSnapshot?.country !== 'India') ? 0.7 : 1, cursor: (!isPro || watched?.clientSnapshot?.country !== 'India') ? 'not-allowed' : 'pointer' }}
+                    disabled={watched?.clientSnapshot?.country !== 'India'}
+                    style={{ opacity: (watched?.clientSnapshot?.country !== 'India') ? 0.7 : 1, cursor: (watched?.clientSnapshot?.country !== 'India') ? 'not-allowed' : 'pointer' }}
                   >
                     {watched?.clientSnapshot?.country !== 'India' ? (
                       <option value="0">0% (N/A for Non-India)</option>
-                    ) : isPro ? (
+                    ) : (
                       GST_OPTIONS.map((g) => (
                         <option key={g.value} value={g.value}>{g.label}</option>
                       ))
-                    ) : (
-                      <option value="0">0% (Pro Required)</option>
                     )}
                   </select>
-                  {!isPro && watched?.clientSnapshot?.country === 'India' && (
-                    <button type="button" onClick={() => alert('Upgrades are currently disabled')} style={{ background: 'none', border: 'none', color: '#6366f1', fontSize: 11, marginTop: 4, cursor: 'pointer', textAlign: 'left', padding: 0 }}>
-                      Unlock GST Calculation
-                    </button>
-                  )}
+
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: 12, color: 'var(--text-dim)', marginBottom: 4 }}>

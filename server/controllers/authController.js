@@ -93,13 +93,10 @@ const googleAuth = async (req, res, next) => {
     }
 
     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
+    client.setCredentials({ access_token: credential });
     
-    const payload = ticket.getPayload();
-    const { sub: googleId, email, name, picture } = payload;
+    const userInfo = await client.request({ url: 'https://www.googleapis.com/oauth2/v3/userinfo' });
+    const { sub: googleId, email, name, picture } = userInfo.data;
 
     let user = await User.findOne({ email });
 
