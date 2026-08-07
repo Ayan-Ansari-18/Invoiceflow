@@ -18,11 +18,25 @@ const app = express();
 
 // ─── Security Middleware ───────────────────────────────────────────────────────
 app.use(helmet({ contentSecurityPolicy: false })); // CSP off for PDF endpoint
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://getinvoiceflow.online',
+  'https://www.getinvoiceflow.online'
+];
+
+if (process.env.CLIENT_URL) {
+  allowedOrigins.push(process.env.CLIENT_URL.trim().replace(/\/$/, ''));
+}
+
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow any origin temporarily to fix CORS block
-      callback(null, true);
+      if (!origin) return callback(null, true); // Allow non-browser requests
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
     },
     credentials: true,
   })
