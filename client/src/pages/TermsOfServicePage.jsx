@@ -12,8 +12,7 @@ const TermsOfServicePage = () => {
           <ArrowLeft size={16} /> Back to Home
         </Link>
         
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: 24, letterSpacing: '-1px' }}>Terms of Service</h1>
-        <p style={{ color: 'var(--text-dim)', marginBottom: 48 }}>Last updated: {new Date().toLocaleDateString()}</p>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: 48, letterSpacing: '-1px' }}>Terms of Service</h1>
         
         <div style={{ lineHeight: 1.8, fontSize: '1.05rem', color: '#e2e8f0', display: 'flex', flexDirection: 'column', gap: 32 }}>
           <section>
