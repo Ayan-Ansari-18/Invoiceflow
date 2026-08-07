@@ -409,7 +409,6 @@ const LandingPage = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <Link to="/privacy" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Privacy Policy</Link>
               <Link to="/terms" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Terms of Service</Link>
-              <Link to="/refund" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Refund Policy</Link>
             </div>
           </div>
         </div>
