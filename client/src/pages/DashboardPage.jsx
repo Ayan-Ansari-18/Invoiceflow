@@ -81,6 +81,7 @@ const DashboardPage = () => {
             <Link to="/invoices" className="btn btn-secondary" style={{ padding: '12px 28px', fontSize: 15 }}>
               Go to Invoices
             </Link>
+          </div>
         </div>
       ) : (
         /* ---- Pro users: full dashboard ---- */
