@@ -13,6 +13,8 @@ import useAuthStore from './store/authStore';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import InvoiceListPage from './pages/InvoiceListPage';
 import InvoiceFormPage from './pages/InvoiceFormPage';
