@@ -3,6 +3,7 @@ const { OAuth2Client } = require('google-auth-library');
 const crypto = require('crypto');
 const emailValidator = require('deep-email-validator');
 const User = require('../models/User');
+const sendEmail = require('../utils/sendEmail');
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -170,11 +171,38 @@ const forgotPassword = async (req, res, next) => {
     // Create reset URL
     const resetUrl = `${process.env.CLIENT_URL || 'https://getinvoiceflow.online'}/reset-password/${resetToken}`;
 
-    // For now, since we don't have SMTP configured, we just log it to the server console.
-    // In production with SMTP, we would send this via email.
-    console.log(`\n\n=== PASSWORD RESET LINK ===\nUser: ${user.email}\nLink: ${resetUrl}\n===========================\n\n`);
+    const message = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        <h2 style="color: #0f172a;">Password Reset Request</h2>
+        <p style="color: #334155; font-size: 16px; line-height: 1.5;">You are receiving this email because you (or someone else) has requested the reset of a password. Please click the button below to reset your password:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${resetUrl}" style="background-color: #4f46e5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">Reset Password</a>
+        </div>
+        <p style="color: #64748b; font-size: 14px;">If you did not request this, please ignore this email and your password will remain unchanged. This link is valid for 10 minutes.</p>
+      </div>
+    `;
 
-    res.status(200).json({ success: true, message: 'Password reset link sent! Check server logs if email is not configured.' });
+    try {
+      if (process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD) {
+        await sendEmail({
+          email: user.email,
+          subject: 'InvoiceFlow Password Reset Token',
+          html: message,
+        });
+        res.status(200).json({ success: true, message: 'Password reset email sent to your inbox!' });
+      } else {
+        // Fallback for when SMTP is not configured yet
+        console.log(`\n\n=== PASSWORD RESET LINK (Fallback) ===\nUser: ${user.email}\nLink: ${resetUrl}\n===========================\n\n`);
+        res.status(200).json({ success: true, message: 'Password reset link generated in logs. SMTP not configured.' });
+      }
+    } catch (err) {
+      console.error('Error sending email:', err);
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+      await user.save({ validateBeforeSave: false });
+      return res.status(500).json({ success: false, message: 'Email could not be sent' });
+    }
+
   } catch (err) {
     next(err);
   }
