@@ -389,18 +389,18 @@ const LandingPage = () => {
           <div>
             <h4 style={{ color: '#fff', fontWeight: 600, marginBottom: 24, fontSize: 16 }}>Product</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <a href="#features" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Features</a>
-              <a href="#pricing" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Pricing</a>
-              <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Changelog</a>
+              <Link to="/#features" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Features</Link>
+              <Link to="/#pricing" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Pricing</Link>
+              <Link to="/changelog" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Changelog</Link>
             </div>
           </div>
 
           <div>
             <h4 style={{ color: '#fff', fontWeight: 600, marginBottom: 24, fontSize: 16 }}>Resources</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Documentation</a>
-              <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Blog</a>
-              <a href="#" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Community</a>
+              <Link to="/docs" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Documentation</Link>
+              <Link to="/blog" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Blog</Link>
+              <Link to="/community" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: 15, transition: 'color 0.2s' }}>Community</Link>
             </div>
           </div>
 

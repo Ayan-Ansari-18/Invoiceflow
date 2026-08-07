@@ -29,6 +29,10 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
+import ChangelogPage from './pages/ChangelogPage';
+import DocumentationPage from './pages/DocumentationPage';
+import BlogPage from './pages/BlogPage';
+import CommunityPage from './pages/CommunityPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,6 +60,10 @@ const App = () => {
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/terms" element={<TermsOfServicePage />} />
+          <Route path="/changelog" element={<ChangelogPage />} />
+          <Route path="/docs" element={<DocumentationPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/community" element={<CommunityPage />} />
 
           {/* Protected & Onboarding */}
           <Route path="/onboarding" element={<AuthGuard><OnboardingPage /></AuthGuard>} />
