@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
+const emailValidator = require('deep-email-validator');
 const User = require('../models/User');
 
 const signToken = (id) =>
@@ -11,6 +12,23 @@ const signToken = (id) =>
 const register = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
+
+    // Validate email authenticity (prevent disposable/fake emails)
+    const { valid, reason, validators } = await emailValidator.validate({
+      email,
+      validateRegex: true,
+      validateMx: true,
+      validateTypo: true,
+      validateDisposable: true,
+      validateSMTP: false // Disabled because it is flaky in many environments
+    });
+    
+    if (!valid) {
+      let message = 'Please use a valid, non-disposable email address.';
+      if (reason === 'disposable') message = 'Disposable emails are not allowed. Please use a real email.';
+      if (reason === 'mx') message = 'This email domain does not exist or cannot receive emails.';
+      return res.status(400).json({ success: false, message });
+    }
 
     const existing = await User.findOne({ email });
     if (existing) {
