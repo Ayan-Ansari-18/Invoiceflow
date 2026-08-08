@@ -83,6 +83,20 @@ const LandingPage = () => {
     <div className="landing" style={{ position: 'relative', overflow: 'hidden' }}>
       <SEO title="Home" />
       
+      <style>{`
+        @media (max-width: 480px) {
+          .landing-nav {
+            padding: 0 16px !important;
+          }
+          .landing-logo-text {
+            display: none !important;
+          }
+          .landing-nav-btns {
+            gap: 8px !important;
+          }
+        }
+      `}</style>
+
       {/* Background Effects */}
       <div style={{
         position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)',
@@ -92,7 +106,7 @@ const LandingPage = () => {
       }} />
 
       {/* Nav */}
-      <nav style={{
+      <nav className="landing-nav" style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
         background: 'rgba(9,9,11,0.6)', backdropFilter: 'blur(24px)',
         borderBottom: '1px solid rgba(255,255,255,0.08)',
@@ -105,11 +119,11 @@ const LandingPage = () => {
             alt="Company Logo"
             style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 8 }}
           />
-          <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18, color: '#fff' }}>
+          <span className="landing-logo-text" style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18, color: '#fff' }}>
             InvoiceFlow
           </span>
         </div>
-        <div style={{ display: 'flex', gap: 12 }}>
+        <div className="landing-nav-btns" style={{ display: 'flex', gap: 12 }}>
           {user ? (
             <Link to="/dashboard" className="btn btn-primary btn-sm">
               <LayoutDashboard size={14} style={{ marginRight: 6 }} /> Dashboard
