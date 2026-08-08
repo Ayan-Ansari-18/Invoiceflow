@@ -329,6 +329,9 @@ p { color: var(--text-muted); line-height: 1.6; }
 .form-label .required { color: #f87171; margin-left: 4px; }
 .form-input, .form-select, .form-textarea {
   width: 100%;
+  max-width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
