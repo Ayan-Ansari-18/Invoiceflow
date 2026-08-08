@@ -249,7 +249,7 @@ const InvoiceFormPage = () => {
             )}
             <button
               className={`btn btn-primary ${isSubmitting || saveMutation.isPending ? 'btn-loading' : ''}`}
-              onClick={isLimitReached ? () => alert('Upgrades are currently disabled') : handleSubmit(onSubmit)}
+              onClick={handleSubmit(onSubmit)}
               disabled={isSubmitting || saveMutation.isPending}
             >
               {isLimitReached ? <><Lock size={16} /> Upgrade to Create</> : <><Save size={16} /> {isEditing ? 'Save Changes' : 'Create Invoice'}</>}
@@ -270,7 +270,6 @@ const InvoiceFormPage = () => {
             <button 
               className="btn btn-sm" 
               style={{ marginLeft: 'auto', background: '#ef4444', color: '#fff' }}
-              onClick={() => alert('Upgrades are currently disabled')}
             >
               Upgrade Now
             </button>
@@ -423,7 +422,7 @@ const InvoiceFormPage = () => {
                     ))}
                   </select>
                   {!isPro && (
-                    <button type="button" onClick={() => alert('Upgrades are currently disabled')} style={{ background: 'none', border: 'none', color: '#6366f1', fontSize: 11, marginTop: 4, cursor: 'pointer', textAlign: 'left', padding: 0 }}>
+                    <button type="button" style={{ background: 'none', border: 'none', color: '#6366f1', fontSize: 11, marginTop: 4, cursor: 'pointer', textAlign: 'left', padding: 0 }}>
                       Unlock Multi-currency
                     </button>
                   )}

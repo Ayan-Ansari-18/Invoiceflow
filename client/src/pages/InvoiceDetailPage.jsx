@@ -76,10 +76,6 @@ const InvoiceDetailPage = () => {
   };
 
   const handleSendEmail = async () => {
-    if (!isPro) {
-      alert('Upgrades are currently disabled');
-      return;
-    }
     if (!data?.clientSnapshot?.email) {
       toast.error('This invoice has no client email address.');
       return;

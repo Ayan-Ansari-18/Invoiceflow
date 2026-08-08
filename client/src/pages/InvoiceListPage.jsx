@@ -61,10 +61,6 @@ const InvoiceListPage = () => {
   };
 
   const handleSendEmail = async (inv) => {
-    if (!isPro) {
-      alert('Upgrades are currently disabled');
-      return;
-    }
     if (!inv.clientSnapshot?.email) {
       toast.error('This invoice has no client email address.');
       return;
@@ -115,15 +111,7 @@ const InvoiceListPage = () => {
               </select>
             </div>
             <button 
-              onClick={(e) => {
-                if (!isPro && data?.pagination?.total >= 5) {
-                  e.preventDefault();
-                  alert('Upgrades are currently disabled');
-                  toast.error('Free plan limit reached (5 invoices). Upgrade to Pro.');
-                } else {
-                  navigate('/invoices/new');
-                }
-              }}
+              onClick={() => navigate('/invoices/new')}
               className="btn btn-primary"
             >
               <Plus size={16} /> New Invoice

@@ -78,7 +78,6 @@ const Sidebar = ({ isOpen, onClose }) => {
               onClick={(e) => {
                 if (!isPro) {
                   e.preventDefault();
-                  alert('Upgrades are currently disabled');
                 } else {
                   navigate(`/${id}`);
                   if (onClose) onClose();
