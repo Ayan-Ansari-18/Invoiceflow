@@ -43,6 +43,8 @@ const schema = z.object({
   paymentLink: z.string().optional(),
 });
 
+const bulkSchema = schema.omit({ clientSnapshot: true });
+
 // ─── Form Section Wrapper ──────────────────────────────────────────────────────
 const FormSection = ({ icon: Icon, title, children }) => (
   <div className="form-section">
@@ -77,8 +79,12 @@ const InvoiceFormPage = () => {
     paymentLink: '',
   };
 
+  const bulkClientIds = location.state?.bulkClientIds || null;
+  const bulkGroupName = location.state?.bulkGroupName || '';
+  const isBulk = Boolean(bulkClientIds && bulkClientIds.length > 0);
+
   const { register, control, handleSubmit, watch, setValue, reset, formState: { errors, isSubmitting } } = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(isBulk ? bulkSchema : schema),
     defaultValues,
   });
 
@@ -159,23 +165,31 @@ const InvoiceFormPage = () => {
     });
   }, [JSON.stringify((watched?.lineItems || [])?.map((l) => `${l?.qty}x${l?.rate}`))]);
 
-  // Create/update mutation
   const saveMutation = useMutation({
     mutationFn: async (formData) => {
-      const isIndia = formData.clientSnapshot?.country === 'India' || !formData.clientSnapshot?.country;
-      const gstPercent = isIndia ? Number(formData.gstPercent) : 0;
+      // In bulk mode, country might not be provided (or varies), but we default to India (or whatever the user has set for their own profile ideally) for tax calculations.
+      // Wait, we can just let gstPercent pass through as they entered it in the form.
+      const gstPercent = Number(formData.gstPercent) || 0;
       const { subtotal, totalAdditionalCharges, totalDiscount, gstAmount, total } = calcTotals(formData.lineItems, gstPercent, formData.additionalCharges || [], formData.discount || null);
       const payload = { ...formData, gstPercent, subtotal, totalAdditionalCharges, totalDiscount, gstAmount, total };
 
+      if (isBulk) {
+        return api.post('/invoices/bulk', { clientIds: bulkClientIds, invoiceData: payload }).then((r) => r.data);
+      }
       if (isEditing) {
         return api.put(`/invoices/${id}`, payload).then((r) => r.data.invoice);
       }
       return api.post('/invoices', payload).then((r) => r.data.invoice);
     },
-    onSuccess: (invoice) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['invoices'] });
-      toast.success(isEditing ? 'Invoice updated!' : 'Invoice created!');
-      navigate(`/invoices/${invoice._id}`);
+      if (isBulk) {
+        toast.success(`Generated ${data.count} bulk invoices!`);
+        navigate('/invoices');
+      } else {
+        toast.success(isEditing ? 'Invoice updated!' : 'Invoice created!');
+        navigate(`/invoices/${data._id}`);
+      }
     },
     onError: (err) => toast.error(getErrorMessage(err)),
   });
@@ -263,72 +277,81 @@ const InvoiceFormPage = () => {
           <div className="invoice-form-panel">
             {/* Client Details */}
             <FormSection icon={User} title="Client Details">
-              <div className="form-row form-row-2">
-                <div className="form-group">
-                  <label className="form-label">Client Name <span className="required">*</span></label>
-                  <input
-                    {...register('clientSnapshot.name')}
-                    className={`form-input ${errors.clientSnapshot?.name ? 'error' : ''}`}
-                    placeholder="Acme Pvt. Ltd."
-                  />
-                  {errors.clientSnapshot?.name && (
-                    <p className="form-error">{errors.clientSnapshot.name.message}</p>
-                  )}
+              {isBulk ? (
+                <div style={{ padding: '16px', background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '8px' }}>
+                  <p style={{ color: '#fff', fontWeight: 600, marginBottom: '4px' }}>Bulk Invoicing Group: {bulkGroupName}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>This invoice will be duplicated and sent to all {bulkClientIds.length} clients in this group.</p>
                 </div>
-                <div className="form-group">
-                  <label className="form-label">Client Email <span className="required">*</span></label>
-                  <input
-                    {...register('clientSnapshot.email')}
-                    className={`form-input ${errors.clientSnapshot?.email ? 'error' : ''}`}
-                    placeholder="client@company.com"
-                    type="email"
-                  />
-                  {errors.clientSnapshot?.email && (
-                    <p className="form-error">{errors.clientSnapshot.email.message}</p>
-                  )}
-                </div>
-              </div>
-              <div className="form-row form-row-3">
-                <div className="form-group">
-                  <label className="form-label">Phone <span className="required">*</span></label>
-                  <input
-                    {...register('clientSnapshot.phone')}
-                    className={`form-input ${errors.clientSnapshot?.phone ? 'error' : ''}`}
-                    placeholder="+91 98765 43210"
-                  />
-                  {errors.clientSnapshot?.phone && (
-                    <p className="form-error">{errors.clientSnapshot.phone.message}</p>
-                  )}
-                </div>
-                <div className="form-group">
-                  <label className="form-label">GSTIN</label>
-                  <input
-                    {...register('clientSnapshot.GSTIN')}
-                    className="form-input"
-                    placeholder="29ABCDE1234F1Z5"
-                    style={{ textTransform: 'uppercase' }}
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Country <span className="required">*</span></label>
-                  <select {...register('clientSnapshot.country')} className="form-select">
-                    <option value="India">India</option>
-                    <option value="Other">Other Country</option>
-                  </select>
-                </div>
-              </div>
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label">Address <span className="required">*</span></label>
-                <textarea
-                  {...register('clientSnapshot.address')}
-                  className={`form-textarea ${errors.clientSnapshot?.address ? 'error' : ''}`}
-                  placeholder="123 MG Road, Bangalore, Karnataka 560001"
-                  rows={2}
-                />
-                {errors.clientSnapshot?.address && (
-                  <p className="form-error">{errors.clientSnapshot.address.message}</p>
-                )}
-              </div>
+              ) : (
+                <>
+                  <div className="form-row form-row-2">
+                    <div className="form-group">
+                      <label className="form-label">Client Name <span className="required">*</span></label>
+                      <input
+                        {...register('clientSnapshot.name')}
+                        className={`form-input ${errors.clientSnapshot?.name ? 'error' : ''}`}
+                        placeholder="Acme Pvt. Ltd."
+                      />
+                      {errors.clientSnapshot?.name && (
+                        <p className="form-error">{errors.clientSnapshot.name.message}</p>
+                      )}
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Client Email <span className="required">*</span></label>
+                      <input
+                        {...register('clientSnapshot.email')}
+                        className={`form-input ${errors.clientSnapshot?.email ? 'error' : ''}`}
+                        placeholder="client@company.com"
+                        type="email"
+                      />
+                      {errors.clientSnapshot?.email && (
+                        <p className="form-error">{errors.clientSnapshot.email.message}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="form-row form-row-3">
+                    <div className="form-group">
+                      <label className="form-label">Phone <span className="required">*</span></label>
+                      <input
+                        {...register('clientSnapshot.phone')}
+                        className={`form-input ${errors.clientSnapshot?.phone ? 'error' : ''}`}
+                        placeholder="+91 98765 43210"
+                      />
+                      {errors.clientSnapshot?.phone && (
+                        <p className="form-error">{errors.clientSnapshot.phone.message}</p>
+                      )}
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">GSTIN</label>
+                      <input
+                        {...register('clientSnapshot.GSTIN')}
+                        className="form-input"
+                        placeholder="29ABCDE1234F1Z5"
+                        style={{ textTransform: 'uppercase' }}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Country <span className="required">*</span></label>
+                      <select {...register('clientSnapshot.country')} className="form-select">
+                        <option value="India">India</option>
+                        <option value="Other">Other Country</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label">Address <span className="required">*</span></label>
+                    <textarea
+                      {...register('clientSnapshot.address')}
+                      className={`form-textarea ${errors.clientSnapshot?.address ? 'error' : ''}`}
+                      placeholder="123 MG Road, Bangalore, Karnataka 560001"
+                      rows={2}
+                    />
+                    {errors.clientSnapshot?.address && (
+                      <p className="form-error">{errors.clientSnapshot.address.message}</p>
+                    )}
+                  </div>
+                </>
+              )}
             </FormSection>
 
             {/* Invoice Details */}
@@ -340,7 +363,9 @@ const InvoiceFormPage = () => {
                     {...register('invoiceNumber')}
                     className="form-input"
                     type="text"
-                    placeholder="Leave empty to auto-generate"
+                    disabled={isBulk}
+                    placeholder={isBulk ? "Auto-generated for each client" : "Leave empty to auto-generate"}
+                    style={isBulk ? { cursor: 'not-allowed', opacity: 0.7 } : {}}
                   />
                 </div>
                 <div className="form-group">

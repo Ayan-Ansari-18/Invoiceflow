@@ -56,6 +56,66 @@ const createInvoice = async (req, res, next) => {
   }
 };
 
+// POST /api/invoices/bulk
+const createBulkInvoices = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const { clientIds, invoiceData } = req.body;
+
+    if (!clientIds || !Array.isArray(clientIds) || clientIds.length === 0) {
+      return res.status(400).json({ success: false, message: 'No clients provided' });
+    }
+
+    if (user.plan === 'free' && (user.invoiceCounter + clientIds.length) > 5) {
+      return res.status(403).json({
+        success: false,
+        message: `Free plan limit reached. Creating ${clientIds.length} invoices would exceed your 5 invoice limit.`,
+      });
+    }
+
+    const { lineItems, gstPercent = 18, ...rest } = invoiceData;
+    const { subtotal, gstAmount, total } = calcTotals(lineItems, gstPercent);
+
+    const Client = require('../models/Client');
+    const clients = await Client.find({ _id: { $in: clientIds }, userId: user._id });
+
+    const invoices = [];
+    for (const client of clients) {
+      user.invoiceCounter += 1;
+      const invoiceNumber = `${user.invoicePrefix}-${String(user.invoiceCounter).padStart(3, '0')}`;
+      
+      invoices.push({
+        ...rest,
+        invoiceNumber,
+        userId: user._id,
+        clientId: client._id,
+        clientSnapshot: {
+          name: client.name,
+          email: client.email,
+          phone: client.phone,
+          address: client.address,
+          GSTIN: client.GSTIN,
+          country: client.country || 'India',
+        },
+        lineItems,
+        subtotal,
+        gstPercent,
+        gstAmount,
+        total,
+      });
+    }
+
+    await user.save();
+    
+    // Bulk insert
+    const createdInvoices = await Invoice.insertMany(invoices);
+
+    res.status(201).json({ success: true, count: createdInvoices.length });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // GET /api/invoices
 const getInvoices = async (req, res, next) => {
   try {
@@ -197,4 +257,13 @@ const downloadPDF = async (req, res, next) => {
   }
 };
 
-module.exports = { createInvoice, getInvoices, getInvoice, updateInvoice, deleteInvoice, updateStatus, downloadPDF };
+module.exports = {
+  createInvoice,
+  createBulkInvoices,
+  getInvoices,
+  getInvoice,
+  updateInvoice,
+  deleteInvoice,
+  updateStatus,
+  downloadPDF,
+};

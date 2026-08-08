@@ -1,5 +1,6 @@
 import { Users, Plus, Folder, Trash2, ArrowLeft, TrendingUp, AlertTriangle, Send, Zap, CheckSquare, Square } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import AppLayout from '../components/layout/AppLayout';
@@ -9,6 +10,7 @@ import { formatCurrency } from '../utils/helpers';
 
 const ClientGroupsPage = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [groups, setGroups] = useState([]);
   const [assignments, setAssignments] = useState({}); // { [groupId]: [clientId, clientId] }
   const [newGroupName, setNewGroupName] = useState('');
@@ -87,61 +89,7 @@ const ClientGroupsPage = () => {
     saveAssignments({ ...assignments, [groupId]: updatedGroupClients });
   };
 
-  const handleBulkInvoice = async (e) => {
-    e.preventDefault();
-    if (!bulkForm.amount || !bulkForm.description) return toast.error('Fill all fields');
-    
-    const assignedClientIds = activeGroup === 'defaulters' 
-      ? defaulterClients.map(c => c._id) 
-      : (assignments[activeGroup.id] || []);
-      
-    if (assignedClientIds.length === 0) return toast.error('No clients in this group');
-
-    setIsBulking(true);
-    let successCount = 0;
-    
-    for (const cid of assignedClientIds) {
-      try {
-        const clientDetails = allClients.find(c => c._id === cid) || {};
-        await api.post('/invoices', {
-          clientId: cid,
-          clientSnapshot: {
-            name: clientDetails.name || 'Unknown Client',
-            email: clientDetails.email || '',
-            phone: clientDetails.phone || '',
-            address: clientDetails.address || '',
-            GSTIN: clientDetails.GSTIN || '',
-            country: clientDetails.country || 'India'
-          },
-          currency: 'INR',
-          gstPercent: 0,
-          issueDate: new Date().toISOString(),
-          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // +7 days
-          notes: 'Auto-generated via Bulk Invoicing',
-          lineItems: [{
-            description: bulkForm.description,
-            qty: 1,
-            rate: Number(bulkForm.amount),
-            amount: Number(bulkForm.amount)
-          }],
-          subtotal: Number(bulkForm.amount),
-          total: Number(bulkForm.amount),
-          gstAmount: 0,
-          additionalCharges: [],
-          discount: null
-        });
-        successCount++;
-      } catch (err) {
-        console.error('Failed to create bulk invoice for client', cid);
-      }
-    }
-    
-    queryClient.invalidateQueries(['invoices']);
-    setIsBulking(false);
-    setShowBulkModal(false);
-    setBulkForm({ amount: '', description: '' });
-    toast.success(`Successfully generated ${successCount} invoices!`);
-  };
+  // Bulk Modal is removed, using InvoiceFormPage instead
 
   // Smart Group Logic
   const defaulterClients = allClients.filter(c => {
@@ -189,7 +137,7 @@ const ClientGroupsPage = () => {
                 <Users size={16} /> Manage Clients
               </button>
             )}
-            <button className="btn btn-primary" onClick={() => setShowBulkModal(true)} disabled={analytics.count === 0}>
+            <button className="btn btn-primary" onClick={() => navigate('/invoices/new', { state: { bulkClientIds: clientIds, bulkGroupName: groupName } })} disabled={analytics.count === 0}>
               <Zap size={16} /> Bulk Invoice
             </button>
           </div>
@@ -226,37 +174,7 @@ const ClientGroupsPage = () => {
             </table>
           )}
         </div>
-
-        {/* Bulk Modal */}
-        {showBulkModal && (
-          <div className="modal-overlay" onClick={() => setShowBulkModal(false)}>
-            <div className="modal" onClick={e => e.stopPropagation()}>
-              <div className="modal-header">
-                <h3 className="modal-title">Bulk Invoice Group</h3>
-                <button className="modal-close" onClick={() => setShowBulkModal(false)}>✕</button>
-              </div>
-              <form onSubmit={handleBulkInvoice} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>
-                  This will generate and save a separate invoice for all {analytics.count} clients in this group.
-                </p>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Item Description</label>
-                  <input className="form-input" value={bulkForm.description} onChange={e => setBulkForm({...bulkForm, description: e.target.value})} placeholder="Monthly Retainer Fee" required />
-                </div>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Amount (per client)</label>
-                  <input className="form-input" type="number" value={bulkForm.amount} onChange={e => setBulkForm({...bulkForm, amount: e.target.value})} placeholder="500" required />
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 8 }}>
-                  <button type="button" className="btn btn-ghost" onClick={() => setShowBulkModal(false)}>Cancel</button>
-                  <button type="submit" className="btn btn-primary" disabled={isBulking}>
-                    {isBulking ? 'Generating...' : `Generate ${analytics.count} Invoices`}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+        {/* Bulk Modal has been replaced by the full invoice form */}
 
         {/* Assign Modal */}
         {showAssignModal && !isSmart && (
