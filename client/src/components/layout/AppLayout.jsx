@@ -44,7 +44,7 @@ const AppLayout = ({ children, title }) => {
           </div>
         </header>
         <motion.main 
-          style={{ padding: '32px' }}
+          className="page-content"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}

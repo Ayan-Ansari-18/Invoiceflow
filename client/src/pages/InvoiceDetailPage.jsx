@@ -125,7 +125,7 @@ const InvoiceDetailPage = () => {
       <SEO title={`Invoice ${invoice.invoiceNumber}`} />
       <div>
         {/* Top Actions */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="detail-actions-top mb-6">
           <button className="btn btn-ghost btn-sm" onClick={() => navigate('/invoices')}>
             <ArrowLeft size={16} /> Back to Invoices
           </button>
@@ -159,14 +159,14 @@ const InvoiceDetailPage = () => {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: 24, alignItems: 'start' }}>
+        <div className="invoice-detail-grid">
           {/* Left: Preview */}
           <div>
             <InvoicePreview data={invoice} user={user} />
           </div>
 
           {/* Right: Sidebar Info */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="flex flex-col gap-4">
             {/* Status Card */}
             <div className="card">
               <h3 style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 16 }}>Payment Status</h3>

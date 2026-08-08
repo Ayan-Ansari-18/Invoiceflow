@@ -98,7 +98,7 @@ const DashboardPage = () => {
           </div>
 
           {/* Stat Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 32 }}>
+          <div className="stat-grid-dashboard" style={{ marginBottom: 32 }}>
             <StatCard label="Total Revenue" value={formatCurrency(totalRevenue)} sub={`${paid.length} paid invoice${paid.length !== 1 ? 's' : ''}`} icon={TrendingUp} color="#10b981" />
             <StatCard label="Pending" value={formatCurrency(pendingRevenue)} sub={`${pending.length} awaiting payment`} icon={Clock} color="#f59e0b" />
             <StatCard label="Overdue" value={overdue.length} sub={overdue.length ? 'Requires attention!' : 'All clear!'} icon={AlertTriangle} color={overdue.length ? '#ef4444' : '#10b981'} />
