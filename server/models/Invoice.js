@@ -104,7 +104,7 @@ const invoiceSchema = new mongoose.Schema(
     },
     currency: {
       type: String,
-      enum: ['INR', 'USD', 'EUR', 'GBP', 'AED'],
+      enum: ['INR', 'USD', 'EUR', 'GBP', 'AED', 'AUD', 'CAD', 'SGD', 'JPY'],
       default: 'INR',
     },
     status: {

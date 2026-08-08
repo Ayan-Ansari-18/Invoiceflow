@@ -83,6 +83,10 @@ export const CURRENCY_OPTIONS = [
   { value: 'EUR', label: '€ EUR — Euro' },
   { value: 'GBP', label: '£ GBP — British Pound' },
   { value: 'AED', label: 'AED — UAE Dirham' },
+  { value: 'AUD', label: 'A$ AUD — Australian Dollar' },
+  { value: 'CAD', label: 'C$ CAD — Canadian Dollar' },
+  { value: 'SGD', label: 'S$ SGD — Singapore Dollar' },
+  { value: 'JPY', label: '¥ JPY — Japanese Yen' },
 ];
 
 // Get user initials for avatar
