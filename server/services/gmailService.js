@@ -132,14 +132,17 @@ const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail,
     to: `${toName ? `"${toName}" ` : ''}<${toEmail}>`,
     subject: `Invoice ${invoiceNumber} from ${businessName || fromEmail} — ${formattedTotal} due ${formattedDue}`,
     html: htmlBody,
-    attachments: [
+  };
+
+  if (pdfBuffer) {
+    mailOptions.attachments = [
       {
         filename: `${invoiceNumber}.pdf`,
         content: pdfBuffer,
         contentType: 'application/pdf',
       },
-    ],
-  };
+    ];
+  }
 
   await transporter.sendMail(mailOptions);
 };

@@ -112,7 +112,12 @@ const sendInvoice = async (req, res) => {
     // Generate PDF and send email in the background
     (async () => {
       try {
-        const pdfBuffer = await generateInvoicePDF(invoice, user);
+        let pdfBuffer = null;
+        try {
+          pdfBuffer = await generateInvoicePDF(invoice, user);
+        } catch (pdfErr) {
+          console.error('Failed to generate PDF, sending email without attachment:', pdfErr);
+        }
 
         await sendInvoiceEmail({
           accessToken: user.gmailAccessToken,
@@ -135,6 +140,7 @@ const sendInvoice = async (req, res) => {
         }
       } catch (bgError) {
         console.error('Background email sending failed:', bgError);
+        require('fs').appendFileSync(require('path').join(__dirname, '../email-error.log'), new Date().toISOString() + ': ' + bgError.stack + '\n');
       }
     })();
   } catch (err) {
