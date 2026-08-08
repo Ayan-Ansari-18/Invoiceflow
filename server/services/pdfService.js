@@ -385,8 +385,7 @@ const buildInvoiceHTML = (invoice, user) => {
 const generateInvoicePDF = async (invoice, user) => {
   const browser = await puppeteer.launch({
     headless: true,
-    channel: 'chrome',
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--no-zygote'],
   });
 
   try {

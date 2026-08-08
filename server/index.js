@@ -16,6 +16,7 @@ const { gmailCallback } = require('./controllers/emailController');
 const { errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // ─── Security Middleware ───────────────────────────────────────────────────────
 app.use(helmet({ contentSecurityPolicy: false })); // CSP off for PDF endpoint
