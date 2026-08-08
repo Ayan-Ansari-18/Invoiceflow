@@ -12,7 +12,7 @@ const sendEmail = async (options) => {
 
   if (error) {
     console.error('Resend API Error:', error);
-    throw new Error('Email could not be sent');
+    throw new Error(error.message || 'Email could not be sent');
   }
 
   console.log('Message sent via Resend: %s', data.id);
