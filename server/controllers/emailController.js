@@ -108,7 +108,7 @@ const sendInvoice = async (req, res) => {
 
       // Generate PDF and send email synchronously to catch errors
       let pdfBuffer = null;
-      if (req.body.pdfBase64) {
+      if (req.body && req.body.pdfBase64) {
         const base64Data = req.body.pdfBase64.replace(/^data:application\/pdf;base64,/, "");
         pdfBuffer = Buffer.from(base64Data, 'base64');
       } else {
