@@ -142,7 +142,9 @@ const InvoiceDetailPage = () => {
               onClick={handleDownload} 
               disabled={isDownloading}
               className="btn btn-primary btn-sm"
-            >  <Download size={14} /> Download PDF
+            >
+              {isDownloading ? <Loader className="spin" size={14} /> : <Download size={14} />}
+              {isDownloading ? 'Downloading...' : 'Download PDF'}
             </button>
             <button
               className="btn btn-danger btn-sm"
