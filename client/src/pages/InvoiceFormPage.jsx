@@ -118,6 +118,7 @@ const InvoiceFormPage = () => {
         lineItems: [{ description: '', qty: 1, rate: 0, amount: 0 }],
         additionalCharges: [],
         discount: null,
+        invoiceNumber: '',
         gstPercent: 18,
         currency: 'INR',
         dueDate: '',
@@ -144,7 +145,7 @@ const InvoiceFormPage = () => {
     totalDiscount,
     gstAmount,
     total,
-    invoiceNumber: existingInvoice?.invoiceNumber || 'INV-???',
+    invoiceNumber: watched?.invoiceNumber || existingInvoice?.invoiceNumber || 'INV-???',
     status: existingInvoice?.status || 'draft',
   };
 
@@ -326,7 +327,16 @@ const InvoiceFormPage = () => {
 
             {/* Invoice Details */}
             <FormSection icon={FileText} title="Invoice Details">
-              <div className="form-row form-row-3">
+              <div className="form-row form-row-2">
+                <div className="form-group">
+                  <label className="form-label">Invoice Number</label>
+                  <input
+                    {...register('invoiceNumber')}
+                    className="form-input"
+                    type="text"
+                    placeholder="Leave empty to auto-generate"
+                  />
+                </div>
                 <div className="form-group">
                   <label className="form-label">Issue Date</label>
                   <input

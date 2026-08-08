@@ -27,13 +27,16 @@ const createInvoice = async (req, res, next) => {
       });
     }
 
-    // Auto-increment invoice number per user
-    user.invoiceCounter += 1;
-    await user.save();
+    const { lineItems, gstPercent = 18, invoiceNumber: customInvoiceNumber, ...rest } = req.body;
+    
+    let invoiceNumber = customInvoiceNumber;
+    if (!invoiceNumber || invoiceNumber.trim() === '') {
+      // Auto-increment invoice number per user
+      user.invoiceCounter += 1;
+      await user.save();
+      invoiceNumber = `${user.invoicePrefix}-${String(user.invoiceCounter).padStart(3, '0')}`;
+    }
 
-    const invoiceNumber = `${user.invoicePrefix}-${String(user.invoiceCounter).padStart(3, '0')}`;
-
-    const { lineItems, gstPercent = 18, ...rest } = req.body;
     const { subtotal, gstAmount, total } = calcTotals(lineItems, gstPercent);
 
     const invoice = await Invoice.create({
