@@ -667,6 +667,7 @@ p { color: var(--text-muted); line-height: 1.6; }
   }
 
   /* Mobile Line Items Table */
+  .line-items-table { display: block; width: 100%; }
   .line-items-table thead { display: none; }
   .line-items-table tbody, .line-items-table tr, .line-items-table td { display: block; width: 100%; }
   .line-items-table tr {
@@ -676,10 +677,14 @@ p { color: var(--text-muted); line-height: 1.6; }
     border-radius: var(--radius-lg);
     padding: 16px;
     position: relative;
+    box-sizing: border-box;
   }
   .line-items-table td {
     border: none;
     padding: 6px 0;
+  }
+  .line-items-table td:first-child {
+    padding-right: 36px; /* Space for the remove button */
   }
   .line-items-table td::before {
     content: attr(data-label);
@@ -692,6 +697,7 @@ p { color: var(--text-muted); line-height: 1.6; }
   .line-items-table .line-input-sm, .line-items-table .line-input-md, .line-items-table .line-input {
     max-width: 100% !important;
     width: 100% !important;
+    box-sizing: border-box;
   }
   .line-items-table .amount-cell {
     padding: 8px 0;
