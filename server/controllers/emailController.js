@@ -86,8 +86,8 @@ const disconnectGmail = async (req, res) => {
 const sendInvoice = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('+gmailAccessToken +gmailRefreshToken');
-    if (!user.gmailConnected || !user.gmailRefreshToken) {
-      return res.status(400).json({ success: false, message: 'Gmail not connected. Please connect Gmail first.' });
+    if (!user.gmailConnected) {
+      return res.status(400).json({ success: false, message: 'Gmail not connected! Go to Email Campaigns to connect your Gmail first.' });
     }
 
     const invoice = await Invoice.findOne({ _id: req.params.invoiceId, userId: req.user._id }).populate('clientId');
