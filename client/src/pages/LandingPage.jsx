@@ -5,7 +5,6 @@ import {
   Zap, FileText, Mail, BarChart2, Shield, Smartphone,
   ArrowRight, CheckCircle, LayoutDashboard
 } from 'lucide-react';
-import Footer from '../components/layout/Footer';
 import SEO from '../components/ui/SEO';
 import { useSubscription } from '../hooks/useSubscription';
 import useAuthStore from '../store/authStore';
