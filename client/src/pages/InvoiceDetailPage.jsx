@@ -90,11 +90,7 @@ const InvoiceDetailPage = () => {
       }
     } catch (err) {
       const msg = err?.response?.data?.message || 'Failed to send email';
-      if (msg.includes('Gmail not connected')) {
-        toast.error('Gmail not connected! Go to Email Campaigns to connect your Gmail first.');
-      } else {
-        toast.error(msg);
-      }
+      toast.error(msg);
     } finally {
       setIsSendingEmail(false);
     }
