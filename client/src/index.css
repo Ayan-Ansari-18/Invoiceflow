@@ -638,6 +638,33 @@ p { color: var(--text-muted); line-height: 1.6; }
   .detail-actions-top { flex-direction: column !important; align-items: stretch !important; gap: 12px; }
   .detail-actions-top .flex { flex-wrap: wrap; justify-content: stretch; }
   .stat-grid-dashboard { grid-template-columns: 1fr !important; }
+
+  /* Mobile Table Card Layout */
+  .table thead { display: none; }
+  .table tbody, .table tr, .table td { display: block; width: 100%; }
+  .table tr {
+    margin-bottom: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 12px 16px;
+  }
+  .table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    text-align: right;
+  }
+  .table td:last-child { border-bottom: none; }
+  .table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
 }
 @media (max-width: 480px) {
   .auth-card { padding: 32px 24px; border-radius: 0; border: none; background: transparent; box-shadow: none; }

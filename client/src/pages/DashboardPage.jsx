@@ -144,15 +144,15 @@ const DashboardPage = () => {
                   <tbody>
                     {recent.map((inv) => (
                       <tr key={inv._id}>
-                        <td>
+                        <td data-label="Invoice #">
                           <Link to={`/invoices/${inv._id}`} style={{ color: '#a5b4fc', fontWeight: 700, textDecoration: 'none' }}>
                             {inv.invoiceNumber}
                           </Link>
                         </td>
-                        <td className="primary-cell">{inv.clientSnapshot?.name || inv.clientId?.name || '—'}</td>
-                        <td style={{ color: '#fff', fontWeight: 600 }}>{formatCurrency(inv.total, inv.currency)}</td>
-                        <td>{formatDate(inv.dueDate)}</td>
-                        <td><StatusBadge status={inv.status} /></td>
+                        <td data-label="Client" className="primary-cell">{inv.clientSnapshot?.name || inv.clientId?.name || '—'}</td>
+                        <td data-label="Amount" style={{ color: '#fff', fontWeight: 600 }}>{formatCurrency(inv.total, inv.currency)}</td>
+                        <td data-label="Due Date">{formatDate(inv.dueDate)}</td>
+                        <td data-label="Status"><StatusBadge status={inv.status} /></td>
                       </tr>
                     ))}
                   </tbody>

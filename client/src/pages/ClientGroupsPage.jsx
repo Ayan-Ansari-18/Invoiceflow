@@ -166,8 +166,8 @@ const ClientGroupsPage = () => {
               <tbody>
                 {groupClients?.map(c => (
                   <tr key={c._id}>
-                    <td style={{ color: '#fff' }}>{c.name}</td>
-                    <td>{c.email || '—'}</td>
+                    <td data-label="Name" style={{ color: '#fff' }}>{c.name}</td>
+                    <td data-label="Email">{c.email || '—'}</td>
                   </tr>
                 ))}
               </tbody>

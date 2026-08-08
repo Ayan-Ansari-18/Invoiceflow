@@ -168,19 +168,19 @@ const InvoiceListPage = () => {
               <tbody>
                 {invoices?.map((inv) => (
                   <tr key={inv._id} style={{ cursor: 'pointer' }} onClick={() => navigate(`/invoices/${inv._id}`)}>
-                    <td className="primary-cell" style={{ fontWeight: 700, color: '#a5b4fc' }}>
+                    <td data-label="Invoice #" className="primary-cell" style={{ fontWeight: 700, color: '#a5b4fc' }}>
                       {inv.invoiceNumber}
                     </td>
-                    <td className="primary-cell">
+                    <td data-label="Client" className="primary-cell">
                       {inv.clientSnapshot?.name || inv.clientId?.name || '—'}
                     </td>
-                    <td style={{ color: '#fff', fontWeight: 600 }}>
+                    <td data-label="Amount" style={{ color: '#fff', fontWeight: 600 }}>
                       {formatCurrency(inv.total, inv.currency)}
                     </td>
-                    <td>{formatDate(inv.issueDate || inv.createdAt)}</td>
-                    <td>{formatDate(inv.dueDate)}</td>
-                    <td><StatusBadge status={inv.status} /></td>
-                    <td>
+                    <td data-label="Issue Date">{formatDate(inv.issueDate || inv.createdAt)}</td>
+                    <td data-label="Due Date">{formatDate(inv.dueDate)}</td>
+                    <td data-label="Status"><StatusBadge status={inv.status} /></td>
+                    <td data-label="Actions">
                       <div
                         className="flex gap-2 justify-end"
                         onClick={(e) => e.stopPropagation()}
