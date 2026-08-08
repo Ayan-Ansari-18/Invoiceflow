@@ -121,68 +121,34 @@ const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail,
 </body>
 </html>`;
 
-  const boundaryMixed = '__XYZ_MIXED__';
-  const boundaryAlt = '__XYZ_ALT__';
-  const nl = '\r\n';
-
-  const subjectText = `Invoice ${invoiceNumber} from ${businessName || fromEmail} — ${formattedTotal} due ${formattedDue}`;
-  const encodedSubject = `=?UTF-8?B?${Buffer.from(subjectText).toString('base64')}?=`;
-  const encodedFromName = `=?UTF-8?B?${Buffer.from(businessName || fromEmail).toString('base64')}?=`;
-  const encodedToName = toName ? `=?UTF-8?B?${Buffer.from(toName).toString('base64')}?=` : '';
-
-  const headers = [
-    `From: ${encodedFromName} <${fromEmail}>`,
-    `To: ${encodedToName ? `${encodedToName} ` : ''}<${toEmail}>`,
-    `Subject: ${encodedSubject}`,
-    'MIME-Version: 1.0',
-    `Content-Type: multipart/mixed; boundary="${boundaryMixed}"`,
-    '',
-  ].join(nl);
-
+  const transporter = nodemailer.createTransport({ streamTransport: true });
+  
   const plainText = `Dear ${toName || 'Valued Client'},\r\n\r\nPlease find your invoice attached to this email. Here is a quick summary:\r\n\r\nInvoice Number: ${invoiceNumber}\r\nAmount Due: ${formattedTotal}\r\nDue Date: ${formattedDue}\r\n\r\nThe full invoice PDF is attached. Please review it and make the payment by the due date.\r\n\r\nThank you,\r\n${businessName || fromEmail}`;
 
-  const chunkBase64 = (str) => {
-    const m = str.match(/.{1,76}/g);
-    return m ? m.join(nl) : '';
+  const mailOptions = {
+    from: `${businessName || fromEmail} <${fromEmail}>`,
+    to: toName ? `${toName} <${toEmail}>` : toEmail,
+    subject: `Invoice ${invoiceNumber} from ${businessName || fromEmail} — ${formattedTotal} due ${formattedDue}`,
+    text: plainText,
+    html: htmlBody,
+    attachments: []
   };
 
-  const bodyParts = [
-    `--${boundaryMixed}`,
-    `Content-Type: multipart/alternative; boundary="${boundaryAlt}"`,
-    '',
-    `--${boundaryAlt}`,
-    'Content-Type: text/plain; charset="UTF-8"',
-    'Content-Transfer-Encoding: 7bit',
-    '',
-    plainText,
-    '',
-    `--${boundaryAlt}`,
-    'Content-Type: text/html; charset="UTF-8"',
-    'Content-Transfer-Encoding: base64',
-    '',
-    chunkBase64(Buffer.from(htmlBody).toString('base64')),
-    '',
-    `--${boundaryAlt}--`,
-    '',
-  ];
-
   if (pdfBuffer) {
-    bodyParts.push(
-      `--${boundaryMixed}`,
-      'Content-Type: application/pdf',
-      'Content-Transfer-Encoding: base64',
-      `Content-Disposition: attachment; filename="${invoiceNumber}.pdf"`,
-      '',
-      chunkBase64(pdfBuffer.toString('base64')),
-      ''
-    );
+    mailOptions.attachments.push({
+      filename: `${invoiceNumber}.pdf`,
+      content: pdfBuffer,
+      contentType: 'application/pdf'
+    });
   }
 
-  bodyParts.push(`--${boundaryMixed}--`);
-
-  const rawMessage = headers + bodyParts.join(nl);
-  const encodedMessage = Buffer.from(rawMessage)
-    .toString('base64')
+  const info = await transporter.sendMail(mailOptions);
+  
+  const chunks = [];
+  for await (const chunk of info.message) {
+    chunks.push(chunk);
+  }
+  const encodedMessage = Buffer.concat(chunks).toString('base64')
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=+$/, '');
