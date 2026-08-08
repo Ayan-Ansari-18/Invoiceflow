@@ -12,6 +12,7 @@ import useAuthStore from '../store/authStore';
 import api from '../services/api';
 import { useSubscription } from '../hooks/useSubscription';
 import { Loader } from 'lucide-react';
+import html2pdf from 'html2pdf.js';
 
 const STATUS_ACTIONS = [
   { status: 'draft', icon: Clock, label: 'Draft' },
@@ -58,15 +59,17 @@ const InvoiceDetailPage = () => {
   const handleDownload = async () => {
     setIsDownloading(true);
     try {
-      const response = await api.get(`/invoices/${id}/pdf`, { responseType: 'blob' });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `${data?.invoiceNumber || 'invoice'}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      const element = document.getElementById('invoice-pdf-content');
+      const opt = {
+        margin:       0,
+        filename:     `${data?.invoiceNumber || 'invoice'}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      
+      // New Promise-based usage:
+      await html2pdf().set(opt).from(element).save();
       toast.success('Downloaded successfully!');
     } catch (err) {
       toast.error('Failed to download PDF');
@@ -159,7 +162,7 @@ const InvoiceDetailPage = () => {
 
         <div className="invoice-detail-grid">
           {/* Left: Preview */}
-          <div>
+          <div id="invoice-pdf-content">
             <InvoicePreview data={invoice} user={user} />
           </div>
 
