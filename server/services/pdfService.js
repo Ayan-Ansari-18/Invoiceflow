@@ -2,13 +2,13 @@ const PDFDocument = require('pdfkit');
 const path = require('path');
 const fs = require('fs');
 
-const currencySymbol = { INR: 'Rs. ', USD: '$', EUR: '€', GBP: '£', AED: 'AED ' };
+const currencySymbol = { INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'AED' };
 
 const formatCurrency = (amount, currency = 'INR') =>
-  `${currencySymbol[currency] || ''}${Number(amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  `${currencySymbol[currency] || ''}${Number(amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const formatDate = (date) =>
-  date ? new Date(date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+  new Date(date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
 const buildInvoiceHTML = (invoice, user) => {
   const sym = currencySymbol[invoice.currency] || '₹';
@@ -395,7 +395,7 @@ const getBufferFromBase64 = (base64Str) => {
 const generateInvoicePDF = (invoice, user) => {
   return new Promise((resolve, reject) => {
     try {
-      const doc = new PDFDocument({ margin: 40, size: 'A4' });
+      const doc = new PDFDocument({ margin: 50, size: 'A4' });
       let buffers = [];
       doc.on('data', buffers.push.bind(buffers));
       doc.on('end', () => {
@@ -404,242 +404,164 @@ const generateInvoicePDF = (invoice, user) => {
       });
       doc.on('error', reject);
 
-      const brandColor = user.brandColor || '#4F46E5';
-      const isPro = user.plan === 'pro';
-
-      // ── Top Header Banner (Full A4 Width: 595.28 pt) ──
-      doc.rect(0, 0, 595.28, 90).fill(brandColor);
+      const brandColor = user.brandColor || '#6366f1';
+      
+      // Header Background
+      doc.rect(0, 0, 595.28, 100).fill(brandColor);
 
       // Logo rendering if available
+      const isPro = user.plan === 'pro';
       const logoBuffer = isPro ? getBufferFromBase64(user.logo) : null;
-      let titleX = 40;
       if (logoBuffer) {
         try {
-          doc.image(logoBuffer, 40, 20, { fit: [50, 50] });
-          titleX = 100;
+          doc.image(logoBuffer, 50, 25, { fit: [50, 50] });
         } catch (logoErr) {
           console.error('Error adding logo to PDF:', logoErr);
         }
       }
 
-      // Business Name & Address in Header
+      // Business Name
       doc.fillColor('#ffffff')
-         .fontSize(18)
-         .font('Helvetica-Bold')
-         .text(user.businessName || user.name || 'Your Business', titleX, 24, { width: 300 })
-         .fontSize(8.5)
-         .font('Helvetica')
-         .text(user.businessAddress || '', titleX, 48, { width: 280, lineBreak: true });
+         .fontSize(20)
+         .text(user.businessName || user.name || 'Your Business', logoBuffer ? 110 : 50, 30, { width: 300, lineBreak: false })
+         .fontSize(9)
+         .text(user.businessAddress || '', logoBuffer ? 110 : 50, 55, { width: 300 });
 
       if (user.GSTIN) {
-        doc.text(`GSTIN: ${user.GSTIN}`, titleX, 62);
+        doc.text(`GSTIN: ${user.GSTIN}`, logoBuffer ? 110 : 50, 75);
       }
 
-      // Invoice Number & Status on Header Right
+      // Invoice metadata on the right of header
       doc.fillColor('#ffffff')
-         .fontSize(9)
-         .font('Helvetica-Bold')
-         .text('INVOICE', 400, 22, { align: 'right', width: 155 })
-         .fontSize(16)
-         .text(invoice.invoiceNumber, 400, 36, { align: 'right', width: 155 })
-         .fontSize(8.5)
-         .font('Helvetica')
-         .text(`Status: ${(invoice.status || 'draft').toUpperCase()}`, 400, 58, { align: 'right', width: 155 });
-
-      // ── Metadata Section (3 Clear Columns) ──
-      let yMeta = 110;
-
-      // Col 1: BILL TO
-      const clientInfo = invoice.clientSnapshot || (invoice.clientId ? invoice.clientId : {});
-      doc.fillColor('#6b7280')
-         .fontSize(8)
-         .font('Helvetica-Bold')
-         .text('BILL TO', 40, yMeta)
-         .fillColor('#111827')
          .fontSize(10)
-         .font('Helvetica-Bold')
-         .text(clientInfo.name || 'Valued Client', 40, yMeta + 14)
-         .fillColor('#4b5563')
-         .fontSize(8.5)
-         .font('Helvetica')
-         .text(clientInfo.email || '', 40, yMeta + 28)
-         .text(clientInfo.address || '', 40, yMeta + 40, { width: 160 });
+         .text('INVOICE', 450, 30, { align: 'right', width: 95 })
+         .fontSize(15)
+         .text(invoice.invoiceNumber, 450, 42, { align: 'right', width: 95 })
+         .fontSize(9)
+         .text(invoice.status.toUpperCase(), 450, 65, { align: 'right', width: 95 });
+
+      // Client Info
+      const clientInfo = invoice.clientSnapshot || (invoice.clientId ? invoice.clientId : {});
+      doc.fillColor('#1a1a2e')
+         .fontSize(9)
+         .text('BILL TO', 50, 130)
+         .fontSize(11)
+         .text(clientInfo.name || '—', 50, 145)
+         .fontSize(9)
+         .fillColor('#6b7280')
+         .text(clientInfo.email || '', 50, 160)
+         .text(clientInfo.address || '', 50, 172, { width: 250 });
 
       if (clientInfo.GSTIN) {
-        doc.text(`GSTIN: ${clientInfo.GSTIN}`, 40, yMeta + 65);
+        doc.text(`GSTIN: ${clientInfo.GSTIN}`, 50, 205);
       }
 
-      // Col 2: FROM
+      // Invoice Info Row
+      doc.fillColor('#1a1a2e')
+         .text('ISSUE DATE', 350, 130)
+         .text('DUE DATE', 430, 130)
+         .text('CURRENCY', 510, 130);
+
       doc.fillColor('#6b7280')
-         .fontSize(8)
-         .font('Helvetica-Bold')
-         .text('FROM', 220, yMeta)
-         .fillColor('#111827')
-         .fontSize(10)
-         .font('Helvetica-Bold')
-         .text(user.businessName || user.name || '—', 220, yMeta + 14)
-         .fillColor('#4b5563')
-         .fontSize(8.5)
-         .font('Helvetica')
-         .text(user.email || '', 220, yMeta + 28)
-         .text(user.businessAddress || '', 220, yMeta + 40, { width: 160 });
+         .text(formatDate(invoice.issueDate || new Date()), 350, 145)
+         .text(invoice.dueDate ? formatDate(invoice.dueDate) : '—', 430, 145)
+         .text(invoice.currency, 510, 145);
 
-      // Col 3: DATES & DETAILS
-      doc.fillColor('#6b7280')
-         .fontSize(8)
-         .font('Helvetica-Bold')
-         .text('ISSUE DATE', 410, yMeta)
-         .fillColor('#111827')
-         .fontSize(9)
-         .font('Helvetica')
-         .text(formatDate(invoice.issueDate || new Date()), 410, yMeta + 12)
-
-         .fillColor('#6b7280')
-         .fontSize(8)
-         .font('Helvetica-Bold')
-         .text('DUE DATE', 410, yMeta + 28)
-         .fillColor('#111827')
-         .fontSize(9)
-         .font('Helvetica')
-         .text(formatDate(invoice.dueDate), 410, yMeta + 40)
-
-         .fillColor('#6b7280')
-         .fontSize(8)
-         .font('Helvetica-Bold')
-         .text('CURRENCY', 410, yMeta + 56)
-         .fillColor('#111827')
-         .fontSize(9)
-         .font('Helvetica')
-         .text(invoice.currency || 'INR', 410, yMeta + 68);
-
-      // ── Line Items Table ──
-      let y = 205;
-      
-      // Table Header Background Bar
-      doc.rect(40, y, 515.28, 20).fill('#f3f4f6');
+      // Line Items Table
+      let y = 240;
+      doc.rect(50, y, 495.28, 20).fill('#f3f4f6');
       doc.fillColor('#374151')
-         .fontSize(8.5)
-         .font('Helvetica-Bold')
-         .text('DESCRIPTION', 50, y + 6)
-         .text('QTY', 310, y + 6, { width: 40, align: 'center' })
-         .text('RATE', 370, y + 6, { width: 80, align: 'right' })
-         .text('AMOUNT', 465, y + 6, { width: 80, align: 'right' });
+         .text('Description', 60, y + 5)
+         .text('Qty', 300, y + 5, { width: 50, align: 'center' })
+         .text('Rate', 360, y + 5, { width: 80, align: 'right' })
+         .text('Amount', 450, y + 5, { width: 80, align: 'right' });
 
-      y += 24;
+      y += 20;
+      doc.fillColor('#1a1a2e');
 
-      invoice.lineItems.forEach((item, idx) => {
-        if (y > 700) {
+      invoice.lineItems.forEach((item) => {
+        if (y > 720) {
           doc.addPage();
-          y = 40;
-          doc.rect(40, y, 515.28, 20).fill('#f3f4f6');
+          y = 50;
+          doc.rect(50, y, 495.28, 20).fill('#f3f4f6');
           doc.fillColor('#374151')
-             .fontSize(8.5)
-             .font('Helvetica-Bold')
-             .text('DESCRIPTION', 50, y + 6)
-             .text('QTY', 310, y + 6, { width: 40, align: 'center' })
-             .text('RATE', 370, y + 6, { width: 80, align: 'right' })
-             .text('AMOUNT', 465, y + 6, { width: 80, align: 'right' });
-          y += 24;
+             .text('Description', 60, y + 5)
+             .text('Qty', 300, y + 5, { width: 50, align: 'center' })
+             .text('Rate', 360, y + 5, { width: 80, align: 'right' })
+             .text('Amount', 450, y + 5, { width: 80, align: 'right' });
+          y += 20;
+          doc.fillColor('#1a1a2e');
         }
 
-        // Row border
-        doc.moveTo(40, y + 18).lineTo(555.28, y + 18).stroke('#f3f4f6');
-
-        doc.fillColor('#1f2937')
-           .fontSize(8.5)
-           .font('Helvetica')
-           .text(item.description || '—', 50, y + 3, { width: 250 })
-           .text((item.qty || 1).toString(), 310, y + 3, { width: 40, align: 'center' })
-           .text(formatCurrency(item.rate, invoice.currency), 370, y + 3, { width: 80, align: 'right' })
-           .font('Helvetica-Bold')
-           .text(formatCurrency(item.amount, invoice.currency), 465, y + 3, { width: 80, align: 'right' });
-
-        y += 22;
+        doc.moveTo(50, y + 20).lineTo(545.28, y + 20).stroke('#e5e7eb');
+        doc.text(item.description, 60, y + 5, { width: 230 })
+           .text(item.qty.toString(), 300, y + 5, { width: 50, align: 'center' })
+           .text(formatCurrency(item.rate, invoice.currency), 360, y + 5, { width: 80, align: 'right' })
+           .text(formatCurrency(item.amount, invoice.currency), 450, y + 5, { width: 80, align: 'right' });
+        y += 20;
       });
 
-      // ── Totals Calculation Box ──
+      // Totals Panel
       y += 10;
-      doc.font('Helvetica').fontSize(8.5).fillColor('#4b5563');
-
-      doc.text('Subtotal:', 340, y, { width: 110, align: 'right' })
-         .font('Helvetica-Bold')
-         .fillColor('#111827')
-         .text(formatCurrency(invoice.subtotal, invoice.currency), 465, y, { width: 80, align: 'right' });
-      y += 16;
+      doc.text('Subtotal:', 350, y, { width: 90, align: 'right' })
+         .text(formatCurrency(invoice.subtotal, invoice.currency), 450, y, { width: 80, align: 'right' });
+      y += 15;
 
       if (invoice.additionalCharges && invoice.additionalCharges.length > 0) {
         invoice.additionalCharges.forEach((charge) => {
           const chargeName = charge.type === 'Other (Custom)' ? (charge.name || charge.type) : charge.type;
           let chargeAmt = parseFloat(charge.amount) || 0;
           if (charge.mode === 'Percentage') {
-            chargeAmt = ((invoice.subtotal || 0) * chargeAmt) / 100;
+            chargeAmt = (invoice.subtotal * chargeAmt) / 100;
           }
-          doc.font('Helvetica').fillColor('#4b5563')
-             .text(`${chargeName}:`, 340, y, { width: 110, align: 'right' })
-             .font('Helvetica-Bold').fillColor('#111827')
-             .text(formatCurrency(chargeAmt, invoice.currency), 465, y, { width: 80, align: 'right' });
-          y += 16;
+          doc.text(`${chargeName}:`, 300, y, { width: 140, align: 'right' })
+             .text(formatCurrency(chargeAmt, invoice.currency), 450, y, { width: 80, align: 'right' });
+          y += 15;
         });
       }
 
       if (invoice.totalDiscount > 0) {
-        doc.font('Helvetica').fillColor('#4b5563')
-           .text('Discount:', 340, y, { width: 110, align: 'right' })
-           .font('Helvetica-Bold').fillColor('#dc2626')
-           .text(`-${formatCurrency(invoice.totalDiscount, invoice.currency)}`, 465, y, { width: 80, align: 'right' });
-        y += 16;
+        doc.text('Discount:', 350, y, { width: 90, align: 'right' })
+           .text(`-${formatCurrency(invoice.totalDiscount, invoice.currency)}`, 450, y, { width: 80, align: 'right' });
+        y += 15;
       }
 
       if (invoice.gstPercent > 0) {
-        doc.font('Helvetica').fillColor('#4b5563')
-           .text(`GST (${invoice.gstPercent}%):`, 340, y, { width: 110, align: 'right' })
-           .font('Helvetica-Bold').fillColor('#111827')
-           .text(formatCurrency(invoice.gstAmount, invoice.currency), 465, y, { width: 80, align: 'right' });
-        y += 16;
+        doc.text(`GST (${invoice.gstPercent}%):`, 350, y, { width: 90, align: 'right' })
+           .text(formatCurrency(invoice.gstAmount, invoice.currency), 450, y, { width: 80, align: 'right' });
+        y += 15;
       }
 
-      // Total Due Highlight Banner
-      y += 6;
-      doc.rect(340, y, 215.28, 26).fill(brandColor);
+      y += 5;
+      doc.rect(350, y, 195.28, 25).fill(brandColor);
       doc.fillColor('#ffffff')
-         .fontSize(10)
-         .font('Helvetica-Bold')
-         .text('Total Due:', 350, y + 8, { width: 90, align: 'left' })
-         .text(formatCurrency(invoice.total, invoice.currency), 445, y + 8, { width: 100, align: 'right' });
+         .text('Total Due:', 360, y + 7, { width: 80, align: 'left' })
+         .text(formatCurrency(invoice.total, invoice.currency), 450, y + 7, { width: 80, align: 'right' });
 
-      y += 45;
+      y += 40;
 
-      // ── Notes & Terms ──
+      // Notes
       if (invoice.notes) {
-        doc.fillColor('#111827')
-           .fontSize(8.5)
-           .font('Helvetica-Bold')
-           .text('Notes:', 40, y)
+        doc.fillColor('#1a1a2e')
+           .fontSize(9)
+           .text('Notes', 50, y)
            .fillColor('#6b7280')
-           .font('Helvetica')
-           .text(invoice.notes, 40, y + 12, { width: 300 });
-        y += 35;
+           .text(invoice.notes, 50, y + 15, { width: 495 });
+        y += 45;
       }
 
-      // ── Authorized Signature ──
+      // Signature Rendering if Pro
       const signatureBuffer = isPro ? getBufferFromBase64(user.signature) : null;
       if (signatureBuffer) {
         try {
-          doc.image(signatureBuffer, 430, y - 20, { fit: [100, 35] });
+          doc.image(signatureBuffer, 430, y, { fit: [100, 40] });
           doc.fillColor('#6b7280')
-             .fontSize(7.5)
-             .font('Helvetica')
-             .text('Authorized Signature', 430, y + 20, { width: 100, align: 'center' });
+             .fontSize(8)
+             .text('Authorized Signature', 430, y + 45, { width: 100, align: 'center' });
         } catch (sigErr) {
           console.error('Error adding signature to PDF:', sigErr);
         }
       }
-
-      // ── Footer ──
-      doc.fillColor('#9ca3af')
-         .fontSize(7.5)
-         .font('Helvetica')
-         .text('Thank you for your business!  •  Generated with InvoiceFlow', 40, 770, { align: 'center', width: 515.28 });
 
       doc.end();
     } catch (err) {
