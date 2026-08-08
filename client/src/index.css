@@ -665,6 +665,46 @@ p { color: var(--text-muted); line-height: 1.6; }
     color: var(--text-dim);
     text-transform: uppercase;
   }
+
+  /* Mobile Line Items Table */
+  .line-items-table thead { display: none; }
+  .line-items-table tbody, .line-items-table tr, .line-items-table td { display: block; width: 100%; }
+  .line-items-table tr {
+    margin-bottom: 24px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    position: relative;
+  }
+  .line-items-table td {
+    border: none;
+    padding: 6px 0;
+  }
+  .line-items-table td::before {
+    content: attr(data-label);
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+    display: block;
+    text-transform: uppercase;
+  }
+  .line-items-table .line-input-sm, .line-items-table .line-input-md, .line-items-table .line-input {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+  .line-items-table .amount-cell {
+    padding: 8px 0;
+    font-size: 16px;
+    color: #fff;
+    font-weight: 700;
+  }
+  .remove-row-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(239, 68, 68, 0.1);
+  }
 }
 @media (max-width: 480px) {
   .auth-card { padding: 32px 24px; border-radius: 0; border: none; background: transparent; box-shadow: none; }

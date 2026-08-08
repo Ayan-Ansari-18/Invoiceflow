@@ -233,7 +233,7 @@ const InvoiceFormPage = () => {
       <SEO title={isEditing ? 'Edit Invoice' : 'New Invoice'} />
       <div>
         {/* Top Bar Actions */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="detail-actions-top mb-6">
           <button className="btn btn-ghost btn-sm" onClick={() => navigate('/invoices')}>
             <ArrowLeft size={16} /> Back
           </button>
@@ -451,14 +451,14 @@ const InvoiceFormPage = () => {
                       const amount = qty * rate;
                       return (
                         <tr key={field.id}>
-                          <td>
+                          <td data-label="Description">
                             <input
                               {...register(`lineItems.${i}.description`)}
                               className="line-input"
                               placeholder="Web development services"
                             />
                           </td>
-                          <td>
+                          <td data-label="Qty">
                             <input
                               {...register(`lineItems.${i}.qty`)}
                               className="line-input line-input-sm"
@@ -468,7 +468,7 @@ const InvoiceFormPage = () => {
                               placeholder="1"
                             />
                           </td>
-                          <td>
+                          <td data-label="Rate">
                             <input
                               {...register(`lineItems.${i}.rate`)}
                               className="line-input line-input-md"
@@ -478,7 +478,7 @@ const InvoiceFormPage = () => {
                               placeholder="0.00"
                             />
                           </td>
-                          <td className="amount-cell">
+                          <td data-label="Amount" className="amount-cell">
                             {formatCurrency(amount, watched.currency || 'INR')}
                           </td>
                           <td>
