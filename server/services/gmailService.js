@@ -120,7 +120,8 @@ const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail,
 </body>
 </html>`;
 
-  const boundary = '__XYZ__';
+  const boundaryMixed = '__XYZ_MIXED__';
+  const boundaryAlt = '__XYZ_ALT__';
   const nl = '\r\n';
 
   const subjectText = `Invoice ${invoiceNumber} from ${businessName || fromEmail} — ${formattedTotal} due ${formattedDue}`;
@@ -133,34 +134,45 @@ const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail,
     `To: ${encodedToName ? `${encodedToName} ` : ''}<${toEmail}>`,
     `Subject: ${encodedSubject}`,
     'MIME-Version: 1.0',
-    `Content-Type: multipart/mixed; boundary="${boundary}"`,
+    `Content-Type: multipart/mixed; boundary="${boundaryMixed}"`,
     '',
   ].join(nl);
 
-  const htmlBase64 = Buffer.from(htmlBody).toString('base64');
+  const plainText = `Dear ${toName || 'Valued Client'},\r\n\r\nPlease find your invoice attached to this email. Here is a quick summary:\r\n\r\nInvoice Number: ${invoiceNumber}\r\nAmount Due: ${formattedTotal}\r\nDue Date: ${formattedDue}\r\n\r\nThe full invoice PDF is attached. Please review it and make the payment by the due date.\r\n\r\nThank you,\r\n${businessName || fromEmail}`;
+
   const bodyParts = [
-    `--${boundary}`,
+    `--${boundaryMixed}`,
+    `Content-Type: multipart/alternative; boundary="${boundaryAlt}"`,
+    '',
+    `--${boundaryAlt}`,
+    'Content-Type: text/plain; charset="UTF-8"',
+    'Content-Transfer-Encoding: 7bit',
+    '',
+    plainText,
+    '',
+    `--${boundaryAlt}`,
     'Content-Type: text/html; charset="UTF-8"',
     'Content-Transfer-Encoding: base64',
     '',
-    htmlBase64,
+    Buffer.from(htmlBody).toString('base64'),
+    '',
+    `--${boundaryAlt}--`,
     '',
   ];
 
   if (pdfBuffer) {
-    const pdfBase64 = pdfBuffer.toString('base64');
     bodyParts.push(
-      `--${boundary}`,
+      `--${boundaryMixed}`,
       'Content-Type: application/pdf',
       'Content-Transfer-Encoding: base64',
       `Content-Disposition: attachment; filename="${invoiceNumber}.pdf"`,
       '',
-      pdfBase64,
+      pdfBuffer.toString('base64'),
       ''
     );
   }
 
-  bodyParts.push(`--${boundary}--`);
+  bodyParts.push(`--${boundaryMixed}--`);
 
   const rawMessage = headers + bodyParts.join(nl);
   const encodedMessage = Buffer.from(rawMessage)
