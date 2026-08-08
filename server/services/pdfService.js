@@ -2,13 +2,13 @@ const PDFDocument = require('pdfkit');
 const path = require('path');
 const fs = require('fs');
 
-const currencySymbol = { INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'AED' };
+const currencySymbol = { INR: 'Rs. ', USD: '$', EUR: '€', GBP: '£', AED: 'AED ' };
 
 const formatCurrency = (amount, currency = 'INR') =>
-  `${currencySymbol[currency] || ''}${Number(amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  `${currencySymbol[currency] || ''}${Number(amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const formatDate = (date) =>
-  new Date(date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  date ? new Date(date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
 
 const buildInvoiceHTML = (invoice, user) => {
   const sym = currencySymbol[invoice.currency] || '₹';
@@ -458,14 +458,14 @@ const generateInvoicePDF = (invoice, user) => {
 
       // Invoice Info Row
       doc.fillColor('#1a1a2e')
-         .text('ISSUE DATE', 350, 130)
-         .text('DUE DATE', 430, 130)
-         .text('CURRENCY', 510, 130);
+         .text('ISSUE DATE', 320, 130)
+         .text('DUE DATE', 410, 130)
+         .text('CURRENCY', 500, 130);
 
       doc.fillColor('#6b7280')
-         .text(formatDate(invoice.issueDate || new Date()), 350, 145)
-         .text(invoice.dueDate ? formatDate(invoice.dueDate) : '—', 430, 145)
-         .text(invoice.currency, 510, 145);
+         .text(formatDate(invoice.issueDate || new Date()), 320, 145)
+         .text(invoice.dueDate ? formatDate(invoice.dueDate) : '—', 410, 145)
+         .text(invoice.currency, 500, 145);
 
       // Line Items Table
       let y = 240;
