@@ -123,21 +123,27 @@ const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail,
   const boundary = '__XYZ__';
   const nl = '\r\n';
 
+  const subjectText = `Invoice ${invoiceNumber} from ${businessName || fromEmail} — ${formattedTotal} due ${formattedDue}`;
+  const encodedSubject = `=?UTF-8?B?${Buffer.from(subjectText).toString('base64')}?=`;
+  const encodedFromName = `=?UTF-8?B?${Buffer.from(businessName || fromEmail).toString('base64')}?=`;
+  const encodedToName = toName ? `=?UTF-8?B?${Buffer.from(toName).toString('base64')}?=` : '';
+
   const headers = [
-    `From: "${businessName || fromEmail}" <${fromEmail}>`,
-    `To: ${toName ? `"${toName}" ` : ''}<${toEmail}>`,
-    `Subject: Invoice ${invoiceNumber} from ${businessName || fromEmail} — ${formattedTotal} due ${formattedDue}`,
+    `From: ${encodedFromName} <${fromEmail}>`,
+    `To: ${encodedToName ? `${encodedToName} ` : ''}<${toEmail}>`,
+    `Subject: ${encodedSubject}`,
     'MIME-Version: 1.0',
     `Content-Type: multipart/mixed; boundary="${boundary}"`,
     '',
   ].join(nl);
 
+  const htmlBase64 = Buffer.from(htmlBody).toString('base64');
   const bodyParts = [
     `--${boundary}`,
     'Content-Type: text/html; charset="UTF-8"',
-    'Content-Transfer-Encoding: 7bit',
+    'Content-Transfer-Encoding: base64',
     '',
-    htmlBody,
+    htmlBase64,
     '',
   ];
 
