@@ -99,7 +99,8 @@ const InvoicePreview = ({ data, user }) => {
         </div>
 
         {/* Line Items Table */}
-        <table className="preview-table">
+        <div className="preview-table-wrapper">
+          <table className="preview-table">
           <thead>
             <tr>
               <th style={{ textAlign: 'left', width: '50%' }}>Description</th>
@@ -133,7 +134,8 @@ const InvoicePreview = ({ data, user }) => {
               })
             )}
           </tbody>
-        </table>
+          </table>
+        </div>
 
         {/* Totals */}
         <div className="preview-totals">
