@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer');
+const PDFDocument = require('pdfkit');
 const path = require('path');
 const fs = require('fs');
 
@@ -382,29 +382,192 @@ const buildInvoiceHTML = (invoice, user) => {
 </html>`;
 };
 
-const generateInvoicePDF = async (invoice, user) => {
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--no-zygote'],
-  });
-
-  try {
-    const page = await browser.newPage();
-    const html = buildInvoiceHTML(invoice, user);
-
-    await page.setContent(html, { waitUntil: 'networkidle0' });
-    await page.emulateMediaType('print');
-
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: { top: '0', right: '0', bottom: '0', left: '0' },
-    });
-
-    return pdfBuffer;
-  } finally {
-    await browser.close();
+const getBufferFromBase64 = (base64Str) => {
+  if (!base64Str) return null;
+  const matches = base64Str.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+  if (!matches || matches.length !== 3) {
+    if (base64Str.startsWith('http')) return null;
+    return Buffer.from(base64Str, 'base64');
   }
+  return Buffer.from(matches[2], 'base64');
+};
+
+const generateInvoicePDF = (invoice, user) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const doc = new PDFDocument({ margin: 50, size: 'A4' });
+      let buffers = [];
+      doc.on('data', buffers.push.bind(buffers));
+      doc.on('end', () => {
+        let pdfData = Buffer.concat(buffers);
+        resolve(pdfData);
+      });
+      doc.on('error', reject);
+
+      const brandColor = user.brandColor || '#6366f1';
+      
+      // Header Background
+      doc.rect(0, 0, 595.28, 100).fill(brandColor);
+
+      // Logo rendering if available
+      const isPro = user.plan === 'pro';
+      const logoBuffer = isPro ? getBufferFromBase64(user.logo) : null;
+      if (logoBuffer) {
+        try {
+          doc.image(logoBuffer, 50, 25, { fit: [50, 50] });
+        } catch (logoErr) {
+          console.error('Error adding logo to PDF:', logoErr);
+        }
+      }
+
+      // Business Name
+      doc.fillColor('#ffffff')
+         .fontSize(20)
+         .text(user.businessName || user.name || 'Your Business', logoBuffer ? 110 : 50, 30, { width: 300, lineBreak: false })
+         .fontSize(9)
+         .text(user.businessAddress || '', logoBuffer ? 110 : 50, 55, { width: 300 });
+
+      if (user.GSTIN) {
+        doc.text(`GSTIN: ${user.GSTIN}`, logoBuffer ? 110 : 50, 75);
+      }
+
+      // Invoice metadata on the right of header
+      doc.fillColor('#ffffff')
+         .fontSize(10)
+         .text('INVOICE', 450, 30, { align: 'right', width: 95 })
+         .fontSize(15)
+         .text(invoice.invoiceNumber, 450, 42, { align: 'right', width: 95 })
+         .fontSize(9)
+         .text(invoice.status.toUpperCase(), 450, 65, { align: 'right', width: 95 });
+
+      // Client Info
+      const clientInfo = invoice.clientSnapshot || (invoice.clientId ? invoice.clientId : {});
+      doc.fillColor('#1a1a2e')
+         .fontSize(9)
+         .text('BILL TO', 50, 130)
+         .fontSize(11)
+         .text(clientInfo.name || '—', 50, 145)
+         .fontSize(9)
+         .fillColor('#6b7280')
+         .text(clientInfo.email || '', 50, 160)
+         .text(clientInfo.address || '', 50, 172, { width: 250 });
+
+      if (clientInfo.GSTIN) {
+        doc.text(`GSTIN: ${clientInfo.GSTIN}`, 50, 205);
+      }
+
+      // Invoice Info Row
+      doc.fillColor('#1a1a2e')
+         .text('ISSUE DATE', 350, 130)
+         .text('DUE DATE', 430, 130)
+         .text('CURRENCY', 510, 130);
+
+      doc.fillColor('#6b7280')
+         .text(formatDate(invoice.issueDate || new Date()), 350, 145)
+         .text(invoice.dueDate ? formatDate(invoice.dueDate) : '—', 430, 145)
+         .text(invoice.currency, 510, 145);
+
+      // Line Items Table
+      let y = 240;
+      doc.rect(50, y, 495.28, 20).fill('#f3f4f6');
+      doc.fillColor('#374151')
+         .text('Description', 60, y + 5)
+         .text('Qty', 300, y + 5, { width: 50, align: 'center' })
+         .text('Rate', 360, y + 5, { width: 80, align: 'right' })
+         .text('Amount', 450, y + 5, { width: 80, align: 'right' });
+
+      y += 20;
+      doc.fillColor('#1a1a2e');
+
+      invoice.lineItems.forEach((item) => {
+        if (y > 720) {
+          doc.addPage();
+          y = 50;
+          doc.rect(50, y, 495.28, 20).fill('#f3f4f6');
+          doc.fillColor('#374151')
+             .text('Description', 60, y + 5)
+             .text('Qty', 300, y + 5, { width: 50, align: 'center' })
+             .text('Rate', 360, y + 5, { width: 80, align: 'right' })
+             .text('Amount', 450, y + 5, { width: 80, align: 'right' });
+          y += 20;
+          doc.fillColor('#1a1a2e');
+        }
+
+        doc.moveTo(50, y + 20).lineTo(545.28, y + 20).stroke('#e5e7eb');
+        doc.text(item.description, 60, y + 5, { width: 230 })
+           .text(item.qty.toString(), 300, y + 5, { width: 50, align: 'center' })
+           .text(formatCurrency(item.rate, invoice.currency), 360, y + 5, { width: 80, align: 'right' })
+           .text(formatCurrency(item.amount, invoice.currency), 450, y + 5, { width: 80, align: 'right' });
+        y += 20;
+      });
+
+      // Totals Panel
+      y += 10;
+      doc.text('Subtotal:', 350, y, { width: 90, align: 'right' })
+         .text(formatCurrency(invoice.subtotal, invoice.currency), 450, y, { width: 80, align: 'right' });
+      y += 15;
+
+      if (invoice.additionalCharges && invoice.additionalCharges.length > 0) {
+        invoice.additionalCharges.forEach((charge) => {
+          const chargeName = charge.type === 'Other (Custom)' ? (charge.name || charge.type) : charge.type;
+          let chargeAmt = parseFloat(charge.amount) || 0;
+          if (charge.mode === 'Percentage') {
+            chargeAmt = (invoice.subtotal * chargeAmt) / 100;
+          }
+          doc.text(`${chargeName}:`, 300, y, { width: 140, align: 'right' })
+             .text(formatCurrency(chargeAmt, invoice.currency), 450, y, { width: 80, align: 'right' });
+          y += 15;
+        });
+      }
+
+      if (invoice.totalDiscount > 0) {
+        doc.text('Discount:', 350, y, { width: 90, align: 'right' })
+           .text(`-${formatCurrency(invoice.totalDiscount, invoice.currency)}`, 450, y, { width: 80, align: 'right' });
+        y += 15;
+      }
+
+      if (invoice.gstPercent > 0) {
+        doc.text(`GST (${invoice.gstPercent}%):`, 350, y, { width: 90, align: 'right' })
+           .text(formatCurrency(invoice.gstAmount, invoice.currency), 450, y, { width: 80, align: 'right' });
+        y += 15;
+      }
+
+      y += 5;
+      doc.rect(350, y, 195.28, 25).fill(brandColor);
+      doc.fillColor('#ffffff')
+         .text('Total Due:', 360, y + 7, { width: 80, align: 'left' })
+         .text(formatCurrency(invoice.total, invoice.currency), 450, y + 7, { width: 80, align: 'right' });
+
+      y += 40;
+
+      // Notes
+      if (invoice.notes) {
+        doc.fillColor('#1a1a2e')
+           .fontSize(9)
+           .text('Notes', 50, y)
+           .fillColor('#6b7280')
+           .text(invoice.notes, 50, y + 15, { width: 495 });
+        y += 45;
+      }
+
+      // Signature Rendering if Pro
+      const signatureBuffer = isPro ? getBufferFromBase64(user.signature) : null;
+      if (signatureBuffer) {
+        try {
+          doc.image(signatureBuffer, 430, y, { fit: [100, 40] });
+          doc.fillColor('#6b7280')
+             .fontSize(8)
+             .text('Authorized Signature', 430, y + 45, { width: 100, align: 'center' });
+        } catch (sigErr) {
+          console.error('Error adding signature to PDF:', sigErr);
+        }
+      }
+
+      doc.end();
+    } catch (err) {
+      reject(err);
+    }
+  });
 };
 
 module.exports = { generateInvoicePDF, buildInvoiceHTML };

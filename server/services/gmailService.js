@@ -31,21 +31,13 @@ const getTokensFromCode = async (code) => {
 
 // ─── Send Invoice Email via user's Gmail ──────────────────────────────────────
 const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail, toName, invoiceNumber, pdfBuffer, total, currency, dueDate, businessName }) => {
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      type: 'OAuth2',
-      user: fromEmail,
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      refreshToken: refreshToken,
-      accessToken: accessToken,
-    },
+  const oAuth2Client = createOAuth2Client();
+  oAuth2Client.setCredentials({
+    access_token: accessToken,
+    refresh_token: refreshToken,
   });
 
-  // Verify connection before sending
-  await transporter.verify();
-
+  const gmail = google.gmail({ version: 'v1', auth: oAuth2Client });
 
   const currencySymbol = { INR: '₹', USD: '$', EUR: '€', GBP: '£', AED: 'AED ' };
   const sym = currencySymbol[currency] || '₹';
@@ -128,24 +120,55 @@ const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail,
 </body>
 </html>`;
 
-  const mailOptions = {
-    from: `"${businessName || fromEmail}" <${fromEmail}>`,
-    to: `${toName ? `"${toName}" ` : ''}<${toEmail}>`,
-    subject: `Invoice ${invoiceNumber} from ${businessName || fromEmail} — ${formattedTotal} due ${formattedDue}`,
-    html: htmlBody,
-  };
+  const boundary = '__XYZ__';
+  const nl = '\r\n';
+
+  const headers = [
+    `From: "${businessName || fromEmail}" <${fromEmail}>`,
+    `To: ${toName ? `"${toName}" ` : ''}<${toEmail}>`,
+    `Subject: Invoice ${invoiceNumber} from ${businessName || fromEmail} — ${formattedTotal} due ${formattedDue}`,
+    'MIME-Version: 1.0',
+    `Content-Type: multipart/mixed; boundary="${boundary}"`,
+    '',
+  ].join(nl);
+
+  const bodyParts = [
+    `--${boundary}`,
+    'Content-Type: text/html; charset="UTF-8"',
+    'Content-Transfer-Encoding: 7bit',
+    '',
+    htmlBody,
+    '',
+  ];
 
   if (pdfBuffer) {
-    mailOptions.attachments = [
-      {
-        filename: `${invoiceNumber}.pdf`,
-        content: pdfBuffer,
-        contentType: 'application/pdf',
-      },
-    ];
+    const pdfBase64 = pdfBuffer.toString('base64');
+    bodyParts.push(
+      `--${boundary}`,
+      'Content-Type: application/pdf',
+      'Content-Transfer-Encoding: base64',
+      `Content-Disposition: attachment; filename="${invoiceNumber}.pdf"`,
+      '',
+      pdfBase64,
+      ''
+    );
   }
 
-  await transporter.sendMail(mailOptions);
+  bodyParts.push(`--${boundary}--`);
+
+  const rawMessage = headers + bodyParts.join(nl);
+  const encodedMessage = Buffer.from(rawMessage)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+
+  await gmail.users.messages.send({
+    userId: 'me',
+    requestBody: {
+      raw: encodedMessage,
+    },
+  });
 };
 
 module.exports = { getGmailAuthUrl, getTokensFromCode, sendInvoiceEmail };
