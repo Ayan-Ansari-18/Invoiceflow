@@ -108,10 +108,15 @@ const sendInvoice = async (req, res) => {
 
       // Generate PDF and send email synchronously to catch errors
       let pdfBuffer = null;
-      try {
-        pdfBuffer = await generateInvoicePDF(invoice, user);
-      } catch (pdfErr) {
-        console.error('Failed to generate PDF, sending email without attachment:', pdfErr);
+      if (req.body.pdfBase64) {
+        const base64Data = req.body.pdfBase64.replace(/^data:application\/pdf;base64,/, "");
+        pdfBuffer = Buffer.from(base64Data, 'base64');
+      } else {
+        try {
+          pdfBuffer = await generateInvoicePDF(invoice, user);
+        } catch (pdfErr) {
+          console.error('Failed to generate PDF, sending email without attachment:', pdfErr);
+        }
       }
 
       await sendInvoiceEmail({

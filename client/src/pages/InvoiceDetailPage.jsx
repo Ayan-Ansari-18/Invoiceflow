@@ -12,6 +12,8 @@ import useAuthStore from '../store/authStore';
 import api from '../services/api';
 import { useSubscription } from '../hooks/useSubscription';
 import { Loader } from 'lucide-react';
+import { toPng } from 'html-to-image';
+import jsPDF from 'jspdf';
 
 const STATUS_ACTIONS = [
   { status: 'draft', icon: Clock, label: 'Draft' },
@@ -55,18 +57,28 @@ const InvoiceDetailPage = () => {
     onError: (err) => toast.error(getErrorMessage(err)),
   });
 
+  const generatePdfBase64 = async () => {
+    const element = document.getElementById('invoice-pdf-content');
+    if (!element) throw new Error("Preview element not found");
+    const dataUrl = await toPng(element, { quality: 1.0, pixelRatio: 2 });
+    const pdf = new jsPDF('p', 'pt', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const imgProps = pdf.getImageProperties(dataUrl);
+    const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, imgHeight);
+    return pdf.output('datauristring');
+  };
+
   const handleDownload = async () => {
     setIsDownloading(true);
     try {
-      const response = await api.get(`/invoices/${id}/pdf`, { responseType: 'blob' });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const pdfBase64 = await generatePdfBase64();
       const link = document.createElement('a');
-      link.href = url;
+      link.href = pdfBase64;
       link.setAttribute('download', `${data?.invoiceNumber || 'invoice'}.pdf`);
       document.body.appendChild(link);
       link.click();
       link.remove();
-      window.URL.revokeObjectURL(url);
       toast.success('Downloaded successfully!');
     } catch (err) {
       toast.error('Failed to download PDF');
@@ -82,7 +94,8 @@ const InvoiceDetailPage = () => {
     }
     setIsSendingEmail(true);
     try {
-      const res = await api.post(`/email/send/${data._id}`);
+      const pdfBase64 = await generatePdfBase64();
+      const res = await api.post(`/email/send/${data._id}`, { pdfBase64 });
       toast.success(res.data.message || `Invoice sent to ${data.clientSnapshot.email}!`);
       queryClient.invalidateQueries({ queryKey: ['invoices', id] });
       if (data?.status === 'draft') {
