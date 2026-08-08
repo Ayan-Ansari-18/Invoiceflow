@@ -16,16 +16,19 @@ const clientSchema = new mongoose.Schema(
     },
     email: {
       type: String,
+      required: [true, 'Client email is required'],
       lowercase: true,
       trim: true,
       match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email'],
     },
     phone: {
       type: String,
+      required: [true, 'Client phone is required'],
       trim: true,
     },
     address: {
       type: String,
+      required: [true, 'Client address is required'],
       trim: true,
     },
     GSTIN: {

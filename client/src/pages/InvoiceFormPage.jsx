@@ -28,9 +28,9 @@ const lineItemSchema = z.object({
 const schema = z.object({
   clientSnapshot: z.object({
     name: z.string().min(1, 'Client name required'),
-    email: z.string().email('Invalid email'),
-    phone: z.string().optional(),
-    address: z.string().optional(),
+    email: z.string().min(1, 'Email is required').email('Invalid email'),
+    phone: z.string().min(1, 'Phone is required'),
+    address: z.string().min(1, 'Address is required'),
     GSTIN: z.string().optional(),
   }),
   lineItems: z.array(lineItemSchema).min(1, 'Add at least one item'),
@@ -290,12 +290,15 @@ const InvoiceFormPage = () => {
               </div>
               <div className="form-row form-row-3">
                 <div className="form-group">
-                  <label className="form-label">Phone</label>
+                  <label className="form-label">Phone <span className="required">*</span></label>
                   <input
                     {...register('clientSnapshot.phone')}
-                    className="form-input"
+                    className={`form-input ${errors.clientSnapshot?.phone ? 'error' : ''}`}
                     placeholder="+91 98765 43210"
                   />
+                  {errors.clientSnapshot?.phone && (
+                    <p className="form-error">{errors.clientSnapshot.phone.message}</p>
+                  )}
                 </div>
                 <div className="form-group">
                   <label className="form-label">GSTIN</label>
@@ -315,13 +318,16 @@ const InvoiceFormPage = () => {
                 </div>
               </div>
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label">Address</label>
+                <label className="form-label">Address <span className="required">*</span></label>
                 <textarea
                   {...register('clientSnapshot.address')}
-                  className="form-textarea"
+                  className={`form-textarea ${errors.clientSnapshot?.address ? 'error' : ''}`}
                   placeholder="123 MG Road, Bangalore, Karnataka 560001"
                   rows={2}
                 />
+                {errors.clientSnapshot?.address && (
+                  <p className="form-error">{errors.clientSnapshot.address.message}</p>
+                )}
               </div>
             </FormSection>
 

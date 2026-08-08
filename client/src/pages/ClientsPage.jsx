@@ -81,12 +81,12 @@ const ClientsPage = () => {
                 </div>
                 <div className="form-row form-row-2">
                   <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label">Email</label>
-                    <input className="form-input" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="contact@acme.com" />
+                    <label className="form-label">Email <span className="required">*</span></label>
+                    <input className="form-input" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="contact@acme.com" />
                   </div>
                   <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label className="form-label">Phone</label>
-                    <input className="form-input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+91 98765 43210" />
+                    <label className="form-label">Phone <span className="required">*</span></label>
+                    <input className="form-input" required value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+91 98765 43210" />
                   </div>
                 </div>
                 <div className="form-group" style={{ marginBottom: 0 }}>
@@ -94,8 +94,8 @@ const ClientsPage = () => {
                   <input className="form-input" value={form.GSTIN} onChange={(e) => setForm({ ...form, GSTIN: e.target.value.toUpperCase() })} placeholder="29ABCDE1234F1Z5" maxLength={15} />
                 </div>
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label">Address</label>
-                  <textarea className="form-textarea" rows={2} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Street, City, State PIN" />
+                  <label className="form-label">Address <span className="required">*</span></label>
+                  <textarea className="form-textarea" required rows={2} value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Street, City, State PIN" />
                 </div>
                 <div className="flex gap-3 justify-end" style={{ marginTop: 4 }}>
                   <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>Cancel</button>
