@@ -30,7 +30,7 @@ const getTokensFromCode = async (code) => {
 };
 
 // ─── Send Invoice Email via user's Gmail ──────────────────────────────────────
-const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail, toName, invoiceNumber, pdfBuffer, total, currency, dueDate, businessName }) => {
+const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail, toName, invoiceNumber, pdfBuffer, total, currency, dueDate, businessName, brandColor }) => {
   const oAuth2Client = createOAuth2Client();
   oAuth2Client.setCredentials({
     access_token: accessToken,
@@ -43,6 +43,7 @@ const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail,
   const sym = currencySymbol[currency] || '₹';
   const formattedTotal = `${sym}${Number(total).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const formattedDue = dueDate ? new Date(dueDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+  const bgHex = brandColor || '#6366f1';
 
   const htmlBody = `
 <!DOCTYPE html>
@@ -59,7 +60,7 @@ const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail,
         <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
           <!-- Header -->
           <tr>
-            <td style="background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:40px 48px;">
+            <td style="background:${bgHex};padding:40px 48px;">
               <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:700;letter-spacing:-0.5px;">Invoice Received</h1>
               <p style="margin:8px 0 0;color:rgba(255,255,255,0.8);font-size:15px;">From ${businessName || fromEmail}</p>
             </td>
@@ -85,7 +86,7 @@ const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail,
                 <tr>
                   <td style="padding:8px 0;border-top:1px solid #e5e7eb;">
                     <span style="color:#9ca3af;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Amount Due</span><br>
-                    <span style="color:#6366f1;font-size:24px;font-weight:700;">${formattedTotal}</span>
+                    <span style="color:${bgHex};font-size:24px;font-weight:700;">${formattedTotal}</span>
                   </td>
                 </tr>
                 <tr>
@@ -109,7 +110,7 @@ const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail,
           <tr>
             <td style="background:#f9fafb;padding:24px 48px;border-top:1px solid #e5e7eb;">
               <p style="margin:0;color:#9ca3af;font-size:13px;text-align:center;">
-                Sent via <strong style="color:#6366f1;">InvoiceFlow</strong> • Professional Invoice Management
+                Sent via <strong style="color:${bgHex};">InvoiceFlow</strong> • Professional Invoice Management
               </p>
             </td>
           </tr>

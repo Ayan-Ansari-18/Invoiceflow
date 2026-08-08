@@ -131,6 +131,7 @@ const sendInvoice = async (req, res) => {
         currency: invoice.currency,
         dueDate: invoice.dueDate,
         businessName: user.businessName,
+        brandColor: user.brandColor,
       });
 
       // Update invoice status to 'sent' if it's a draft
