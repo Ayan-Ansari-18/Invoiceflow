@@ -22,7 +22,7 @@ const PRO_NAV_ITEMS = [
   { id: 'branding', icon: Palette, label: 'Custom Branding' },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const { isPro } = useSubscription();
@@ -35,7 +35,7 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
       {/* Logo */}
       <div className="sidebar-logo">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -60,6 +60,7 @@ const Sidebar = () => {
           <motion.div key={to} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 + i * 0.05 }}>
             <NavLink
               to={to}
+              onClick={onClose}
               className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
             >
               <Icon size={18} />
@@ -80,6 +81,7 @@ const Sidebar = () => {
                   alert('Upgrades are currently disabled');
                 } else {
                   navigate(`/${id}`);
+                  if (onClose) onClose();
                 }
               }}
               className="nav-item"
@@ -96,10 +98,9 @@ const Sidebar = () => {
 
         <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.45 }}>
           <div className="sidebar-section-label" style={{ marginTop: 16 }}>Quick Actions</div>
-          <NavLink to="/invoices/new" className="nav-item" style={{
+          <NavLink to="/invoices/new" onClick={onClose} className="nav-item" style={{
             background: 'linear-gradient(135deg, rgba(99,102,241,0.25), rgba(79,70,229,0.15))',
-            border: '1px solid rgba(99,102,241,0.3)',
-            color: '#a5b4fc',
+            color: '#818cf8', fontWeight: 600, border: '1px solid rgba(99,102,241,0.3)'
           }}>
             <Plus size={18} />
             New Invoice
@@ -110,6 +111,7 @@ const Sidebar = () => {
           <div className="sidebar-section-label" style={{ marginTop: 16 }}>Account</div>
           <NavLink
             to="/profile"
+            onClick={onClose}
             className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
           >
             <Settings size={18} />
