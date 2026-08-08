@@ -30,17 +30,17 @@ const InvoicePreview = ({ data, user }) => {
   return (
     <div className="invoice-preview fade-in">
       {/* Header */}
-      <div className="preview-header" style={{ background: `linear-gradient(135deg, ${brandColor}, #4f46e5)` }}>
-        <div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-          {logoData && (
-            <img src={logoData} alt="Logo" style={{ height: 40, width: 40, objectFit: 'contain', background: '#fff', borderRadius: 8, padding: 2 }} />
-          )}
-          <div style={{ fontSize: 18, fontWeight: 800 }}>
-            {user?.businessName || user?.name || 'Your Business'}
-          </div>
-        </div>
-          <div style={{ fontSize: 11, opacity: 0.8, lineHeight: 1.5 }}>
+        <div className="preview-header" style={{ background: `linear-gradient(135deg, ${brandColor}, #4f46e5)` }}>
+          <div style={{ flex: 1, minWidth: 0, paddingRight: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+              {logoData && (
+                <img src={logoData} alt="Logo" style={{ height: 40, width: 40, objectFit: 'contain', background: '#fff', borderRadius: 8, padding: 2, flexShrink: 0 }} />
+              )}
+              <div style={{ fontSize: 18, fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {user?.businessName || user?.name || 'Your Business'}
+              </div>
+            </div>
+            <div style={{ fontSize: 11, opacity: 0.8, lineHeight: 1.5, wordBreak: 'break-word' }}>
             {user?.businessAddress || ''}
             {user?.GSTIN && <><br />GSTIN: {user.GSTIN}</>}
           </div>
@@ -75,26 +75,26 @@ const InvoicePreview = ({ data, user }) => {
         </div>
 
         {/* Bill To / From */}
-        <div className="preview-bill-row">
-          <div style={{ flex: 1 }}>
-            <div className="preview-section-label">Bill To</div>
-            <div style={{ fontWeight: 700, fontSize: 13, color: '#111827' }}>{clientSnapshot.name || '—'}</div>
-            {clientSnapshot.email && <div style={{ fontSize: 11, color: '#6b7280' }}>{clientSnapshot.email}</div>}
-            {clientSnapshot.address && <div style={{ fontSize: 11, color: '#6b7280' }}>{clientSnapshot.address}</div>}
-            {clientSnapshot.GSTIN && (
+          <div className="preview-bill-row">
+            <div style={{ flex: 1, minWidth: 0, paddingRight: 16 }}>
+              <div className="preview-section-label">Bill To</div>
+              <div style={{ fontWeight: 700, fontSize: 13, color: '#111827', wordBreak: 'break-word' }}>{clientSnapshot.name || '—'}</div>
+              {clientSnapshot.email && <div style={{ fontSize: 11, color: '#6b7280', wordBreak: 'break-all' }}>{clientSnapshot.email}</div>}
+              {clientSnapshot.address && <div style={{ fontSize: 11, color: '#6b7280', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>{clientSnapshot.address}</div>}
+              {clientSnapshot.GSTIN && (
               <span style={{
                 display: 'inline-block', marginTop: 4, padding: '1px 6px',
                 background: '#eff6ff', color: '#1d4ed8', borderRadius: 4,
                 fontSize: 10, fontWeight: 600
               }}>GSTIN: {clientSnapshot.GSTIN}</span>
             )}
-          </div>
-          <div style={{ flex: 1 }}>
-            <div className="preview-section-label">From</div>
-            <div style={{ fontWeight: 700, fontSize: 13, color: '#111827' }}>
-              {user?.businessName || user?.name || '—'}
             </div>
-            {user?.email && <div style={{ fontSize: 11, color: '#6b7280' }}>{user.email}</div>}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="preview-section-label">From</div>
+              <div style={{ fontWeight: 700, fontSize: 13, color: '#111827', wordBreak: 'break-word' }}>
+                {user?.businessName || user?.name || '—'}
+              </div>
+              {user?.email && <div style={{ fontSize: 11, color: '#6b7280', wordBreak: 'break-all' }}>{user.email}</div>}
           </div>
         </div>
 
