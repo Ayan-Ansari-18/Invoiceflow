@@ -2,7 +2,7 @@ const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const User = require('../models/User');
 
-const PRO_PLAN_PRICE = 999; // Price in INR
+const PRO_PLAN_PRICE = 299; // Price in INR
 const CURRENCY = 'INR';
 
 // Create Order
