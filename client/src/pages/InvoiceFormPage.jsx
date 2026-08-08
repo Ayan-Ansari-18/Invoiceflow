@@ -294,7 +294,7 @@ const InvoiceFormPage = () => {
                         <input
                           type="text"
                           className="form-input"
-                          style={{ width: '200px', padding: '6px 12px', height: '32px', fontSize: '13px', margin: 0 }}
+                          style={{ maxWidth: '200px', width: '100%', padding: '6px 12px', height: '32px', fontSize: '13px', margin: 0 }}
                           placeholder="Auto-generated"
                           value={bulkInvoiceNumbers[c._id] || ''}
                           onChange={(e) => setBulkInvoiceNumbers({ ...bulkInvoiceNumbers, [c._id]: e.target.value })}
@@ -565,7 +565,7 @@ const InvoiceFormPage = () => {
               
               {/* Discount */}
               <div style={{ marginBottom: 24 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
                   <h4 style={{ fontSize: 13, fontWeight: 600, color: '#e2e8f0', margin: 0 }}>Discount (Optional)</h4>
                   {watched?.discount === null ? (
                     <button type="button" className="btn btn-ghost btn-sm" onClick={() => setValue('discount', { mode: 'Percentage', amount: 0 })}>

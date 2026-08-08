@@ -67,9 +67,18 @@ body {
   color: var(--text);
   min-height: 100vh;
   line-height: 1.6;
+  width: 100%;
+  max-width: 100%;
   overflow-x: hidden;
 }
-#root { min-height: 100vh; display: flex; flex-direction: column; }
+#root { 
+  min-height: 100vh; 
+  display: flex; 
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
 a { color: var(--text-muted); text-decoration: none; transition: color var(--transition); }
 a:hover { color: var(--text); }
 img { max-width: 100%; display: block; }
@@ -93,7 +102,14 @@ p { color: var(--text-muted); line-height: 1.6; }
 .page { min-height: calc(100vh - 70px); padding: 40px 0; }
 
 /* ─── App Shell ─────────────────────────────────────────── */
-.app-layout { display: flex; min-height: 100vh; background: var(--bg); }
+.app-layout { 
+  display: flex; 
+  min-height: 100vh; 
+  background: var(--bg);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
 
 /* Sidebar (Glassmorphic) */
 .sidebar {
@@ -180,7 +196,7 @@ p { color: var(--text-muted); line-height: 1.6; }
 .user-name { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .user-plan { font-size: 11px; color: var(--primary-light); }
 
-.main-content { margin-left: 260px; flex: 1; min-height: 100vh; position: relative; }
+.main-content { margin-left: 260px; flex: 1; min-height: 100vh; position: relative; min-width: 0; max-width: 100%; }
 
 /* ─── Top Bar (Glassmorphic) ────────────────────────────── */
 .topbar {
@@ -366,6 +382,7 @@ p { color: var(--text-muted); line-height: 1.6; }
 .form-row { display: grid; gap: 20px; }
 .form-row-2 { grid-template-columns: 1fr 1fr; }
 .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-row-4 { grid-template-columns: 1fr 1fr 1fr auto; }
 
 /* ─── Premium Tables ────────────────────────────────────── */
 .table-wrapper {
@@ -504,15 +521,15 @@ p { color: var(--text-muted); line-height: 1.6; }
 .preview-footer { border-top: 1px solid #e2e8f0; padding: 24px 32px; background: #f8fafc; font-size: 11px; color: #64748b; display: flex; justify-content: space-between; }
 
 /* ─── Invoice Form Layout ───────────────────────────────── */
-.invoice-form-layout { display: grid; grid-template-columns: 1fr 440px; gap: 32px; align-items: start; }
-.invoice-form-panel { display: flex; flex-direction: column; gap: 24px; }
-.invoice-preview-sticky { position: sticky; top: 100px; }
-.form-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.invoice-form-layout { display: grid; grid-template-columns: 1fr 440px; gap: 32px; align-items: start; width: 100%; max-width: 100%; }
+.invoice-form-panel { display: flex; flex-direction: column; gap: 24px; min-width: 0; max-width: 100%; }
+.invoice-preview-sticky { position: sticky; top: 100px; min-width: 0; max-width: 100%; }
+.form-section { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); min-width: 0; max-width: 100%; }
 .form-section-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.01); }
 .form-section-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: #fff; box-shadow: inset 0 1px 1px rgba(255,255,255,0.1); }
 .form-section-icon svg { width: 18px; height: 18px; stroke-width: 2px; }
 .form-section-title { font-size: 15px; font-weight: 600; color: #fff; }
-.form-section-body { padding: 24px; }
+.form-section-body { padding: 24px; min-width: 0; max-width: 100%; }
 
 /* ─── Auth Pages (Glassmorphic Spline Vibe) ─────────────── */
 .auth-page {
@@ -630,16 +647,28 @@ p { color: var(--text-muted); line-height: 1.6; }
 @media (max-width: 768px) {
   .sidebar { transform: translateX(-100%); background: rgba(9, 9, 11, 0.95); }
   .sidebar.open { transform: translateX(0); }
-  .main-content { margin-left: 0; width: 100%; overflow-x: hidden; }
-  .page-content { padding: 20px 16px !important; }
-  .form-row-2, .form-row-3 { grid-template-columns: 1fr; }
-  .topbar { padding: 0 16px; }
+  .main-content { margin-left: 0; width: 100vw; max-width: 100vw; overflow-x: hidden; }
+  .page-content { padding: 16px 12px !important; width: 100%; max-width: 100vw; box-sizing: border-box; overflow-x: hidden; }
+  
+  /* Replace Grid with Flex on Mobile */
+  .invoice-form-layout { display: flex !important; flex-direction: column !important; width: 100%; max-width: calc(100vw - 24px); }
+  .invoice-form-panel { width: 100%; max-width: 100%; }
+  .invoice-preview-sticky { position: static !important; width: 100%; max-width: 100%; }
+  .form-section { width: 100%; max-width: 100%; overflow: hidden; }
+  
+  .form-row, .form-row-2, .form-row-3, .form-row-4 { display: flex !important; flex-direction: column !important; gap: 16px; width: 100%; max-width: 100%; }
+  
+  .topbar { padding: 0 16px; width: 100%; max-width: 100vw; box-sizing: border-box; }
   .mobile-menu-btn { display: block !important; }
   
-  .invoice-detail-grid { grid-template-columns: 1fr !important; }
+  .invoice-detail-grid { display: flex !important; flex-direction: column !important; width: 100%; }
   .detail-actions-top { flex-direction: column !important; align-items: stretch !important; gap: 12px; }
   .detail-actions-top .flex { flex-wrap: wrap; justify-content: stretch; }
   .stat-grid-dashboard { grid-template-columns: 1fr !important; }
+
+  .form-section-body { padding: 16px; }
+  .form-section-header { padding: 16px; }
+  .form-group { margin-bottom: 16px; }
 
   /* Mobile Table Card Layout */
   .table thead { display: none; }
@@ -723,9 +752,12 @@ p { color: var(--text-muted); line-height: 1.6; }
 /* Mobile Fixes for InvoicePreview */
 @media (max-width: 768px) {
   .invoice-preview {
-    margin: 0 -16px;
-    border-radius: 0;
+    margin: 0 auto;
+    border-radius: var(--radius-sm);
     min-height: auto;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   .preview-header {
     flex-direction: column;
@@ -749,8 +781,9 @@ p { color: var(--text-muted); line-height: 1.6; }
   }
   .preview-table-wrapper {
     overflow-x: auto;
-    margin: 0 -16px;
-    padding: 0 16px;
+    margin: 0;
+    padding: 0;
+    width: 100%;
   }
   .preview-table {
     min-width: 500px; /* Forces scroll instead of squishing */

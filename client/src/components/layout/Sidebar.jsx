@@ -25,7 +25,7 @@ const PRO_NAV_ITEMS = [
 const Sidebar = ({ isOpen, onClose }) => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
-  const { isPro } = useSubscription();
+  const { isPro, upgradeToPro, isUpgrading } = useSubscription();
 
   const handleLogout = () => {
     localStorage.removeItem('invoiceFlow_isPro');
@@ -78,6 +78,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               onClick={(e) => {
                 if (!isPro) {
                   e.preventDefault();
+                  upgradeToPro();
                 } else {
                   navigate(`/${id}`);
                   if (onClose) onClose();
@@ -126,7 +127,28 @@ const Sidebar = ({ isOpen, onClose }) => {
           <div className="user-avatar">{getInitials(user?.name)}</div>
           <div className="user-info">
             <div className="user-name">{user?.businessName || user?.name}</div>
-            <div className="user-plan">{isPro ? '⚡ Pro Plan' : '🆓 Free Plan'}</div>
+            <div className="user-plan">
+              {isPro ? (
+                <span style={{ color: '#10b981', fontWeight: 600 }}>⚡ Pro Plan</span>
+              ) : (
+                <button 
+                  onClick={(e) => { e.stopPropagation(); upgradeToPro(); }}
+                  disabled={isUpgrading}
+                  style={{ 
+                    background: 'linear-gradient(135deg, #f59e0b, #d97706)', 
+                    color: 'white', 
+                    border: 'none', 
+                    padding: '2px 8px', 
+                    borderRadius: '4px', 
+                    fontSize: '11px', 
+                    cursor: 'pointer',
+                    fontWeight: 600
+                  }}
+                >
+                  {isUpgrading ? 'Upgrading...' : 'Upgrade to Pro'}
+                </button>
+              )}
+            </div>
           </div>
           <LogOut size={14} color="var(--text-dim)" />
         </div>

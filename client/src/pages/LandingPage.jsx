@@ -5,7 +5,9 @@ import {
   Zap, FileText, Mail, BarChart2, Shield, Smartphone,
   ArrowRight, CheckCircle, LayoutDashboard
 } from 'lucide-react';
+import Footer from '../components/layout/Footer';
 import SEO from '../components/ui/SEO';
+import { useSubscription } from '../hooks/useSubscription';
 import useAuthStore from '../store/authStore';
 
 const FEATURES = [
@@ -65,6 +67,7 @@ const PLANS = [
 const LandingPage = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
+  const { upgradeToPro, isUpgrading } = useSubscription();
   const location = useLocation();
 
   useEffect(() => {
@@ -367,16 +370,18 @@ const LandingPage = () => {
                       else navigate('/dashboard');
                     } else if (name === 'Pro') {
                       if (!user) {
+                        localStorage.setItem('pendingUpgrade', 'true');
                         navigate('/register');
                       } else {
-                        alert('Upgrades are currently disabled');
+                        upgradeToPro();
                       }
                     }
                   }}
                   className={`btn ${variant === 'btn-primary' ? 'btn-primary' : 'btn-secondary'} btn-full`} 
                   style={{ padding: '16px 24px', fontSize: 15 }}
+                  disabled={name === 'Pro' && isUpgrading}
                 >
-                  {cta}
+                  {name === 'Pro' && isUpgrading ? 'Upgrading...' : cta}
                 </button>
               </motion.div>
             ))}

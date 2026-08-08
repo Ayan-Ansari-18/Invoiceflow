@@ -13,7 +13,7 @@ const ClientsPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', GSTIN: '' });
-  const { isPro } = useSubscription();
+  const { isPro, upgradeToPro, isUpgrading } = useSubscription();
 
   const { data, isLoading } = useQuery({
     queryKey: ['clients'],
@@ -130,8 +130,12 @@ const ClientsPage = () => {
                 </div>
                 <h3 style={{ fontSize: 20, fontWeight: 700, color: '#fff', marginBottom: 8 }}>Client Management Locked</h3>
                 <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 24 }}>Upgrade to Pro to save, manage, and reuse client details across all your invoices.</p>
-                <button onClick={() => alert('Upgrades are currently disabled')} className="btn btn-primary btn-full" style={{ padding: '12px 16px' }}>
-                  <Zap size={16} /> Upgrade to Pro
+                <button 
+                  onClick={() => upgradeToPro()} 
+                  disabled={isUpgrading}
+                  className="btn btn-primary btn-full" style={{ padding: '12px 16px' }}
+                >
+                  <Zap size={16} /> {isUpgrading ? 'Upgrading...' : 'Upgrade to Pro'}
                 </button>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, TrendingUp, FileText, Clock, CheckCircle, AlertTriangle, Zap, Lock } from 'lucide-react';
 import AppLayout from '../components/layout/AppLayout';
@@ -29,7 +30,16 @@ const StatCard = ({ label, value, sub, icon: Icon, color }) => (
 
 const DashboardPage = () => {
   const { user } = useAuthStore();
-  const { isPro } = useSubscription();
+  const { isPro, upgradeToPro, isUpgrading } = useSubscription();
+
+  useEffect(() => {
+    if (localStorage.getItem('pendingUpgrade') === 'true') {
+      localStorage.removeItem('pendingUpgrade');
+      if (!isPro) {
+        setTimeout(() => upgradeToPro(), 1000); // Small delay to let dashboard render
+      }
+    }
+  }, [isPro, upgradeToPro]);
 
   const { data: invoiceData, isLoading } = useQuery({
     queryKey: ['invoices'],
@@ -72,11 +82,12 @@ const DashboardPage = () => {
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
             <button
-              onClick={() => alert('Upgrades are currently disabled')}
+              onClick={() => upgradeToPro()}
+              disabled={isUpgrading}
               className="btn btn-primary"
               style={{ padding: '12px 28px', fontSize: 15 }}
             >
-              <Zap size={16} /> Upgrade to Pro
+              <Zap size={16} /> {isUpgrading ? 'Upgrading...' : 'Upgrade to Pro'}
             </button>
             <Link to="/invoices" className="btn btn-secondary" style={{ padding: '12px 28px', fontSize: 15 }}>
               Go to Invoices
