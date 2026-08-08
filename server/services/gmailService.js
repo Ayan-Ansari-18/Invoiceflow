@@ -141,6 +141,11 @@ const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail,
 
   const plainText = `Dear ${toName || 'Valued Client'},\r\n\r\nPlease find your invoice attached to this email. Here is a quick summary:\r\n\r\nInvoice Number: ${invoiceNumber}\r\nAmount Due: ${formattedTotal}\r\nDue Date: ${formattedDue}\r\n\r\nThe full invoice PDF is attached. Please review it and make the payment by the due date.\r\n\r\nThank you,\r\n${businessName || fromEmail}`;
 
+  const chunkBase64 = (str) => {
+    const m = str.match(/.{1,76}/g);
+    return m ? m.join(nl) : '';
+  };
+
   const bodyParts = [
     `--${boundaryMixed}`,
     `Content-Type: multipart/alternative; boundary="${boundaryAlt}"`,
@@ -155,7 +160,7 @@ const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail,
     'Content-Type: text/html; charset="UTF-8"',
     'Content-Transfer-Encoding: base64',
     '',
-    Buffer.from(htmlBody).toString('base64'),
+    chunkBase64(Buffer.from(htmlBody).toString('base64')),
     '',
     `--${boundaryAlt}--`,
     '',
@@ -168,7 +173,7 @@ const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail,
       'Content-Transfer-Encoding: base64',
       `Content-Disposition: attachment; filename="${invoiceNumber}.pdf"`,
       '',
-      pdfBuffer.toString('base64'),
+      chunkBase64(pdfBuffer.toString('base64')),
       ''
     );
   }
