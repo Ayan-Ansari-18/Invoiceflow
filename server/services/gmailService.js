@@ -169,12 +169,14 @@ const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail,
     .replace(/\//g, '_')
     .replace(/=+$/, '');
 
-  await gmail.users.messages.send({
+  const response = await gmail.users.messages.send({
     userId: 'me',
     requestBody: {
       raw: encodedMessage,
     },
   });
+
+  console.log('Gmail send response:', response.data);
 };
 
 module.exports = { getGmailAuthUrl, getTokensFromCode, sendInvoiceEmail };
