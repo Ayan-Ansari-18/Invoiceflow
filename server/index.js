@@ -12,7 +12,6 @@ const clientRoutes = require('./routes/clients');
 const emailRoutes = require('./routes/email');
 const adminRoutes = require('./routes/admin');
 const subscriptionRoutes = require('./routes/subscription');
-const { gmailCallback } = require('./controllers/emailController');
 const { errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
@@ -70,9 +69,6 @@ app.use('/api/clients', clientRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/subscription', subscriptionRoutes);
-// Gmail OAuth callback (no auth middleware — Google redirects here)
-app.get('/api/auth/gmail/callback', gmailCallback);
-
 // ─── 404 Handler ──────────────────────────────────────────────────────────────
 app.use((req, res) => {
   res.status(404).json({ success: false, message: `Route ${req.originalUrl} not found` });
