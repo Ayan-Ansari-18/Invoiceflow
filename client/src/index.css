@@ -628,7 +628,7 @@ p { color: var(--text-muted); line-height: 1.6; }
 @media (max-width: 768px) {
   .sidebar { transform: translateX(-100%); background: rgba(9, 9, 11, 0.95); }
   .sidebar.open { transform: translateX(0); }
-  .main-content { margin-left: 0; width: 100vw; overflow-x: hidden; }
+  .main-content { margin-left: 0; width: 100%; overflow-x: hidden; }
   .page-content { padding: 20px 16px !important; }
   .form-row-2, .form-row-3 { grid-template-columns: 1fr; }
   .topbar { padding: 0 16px; }

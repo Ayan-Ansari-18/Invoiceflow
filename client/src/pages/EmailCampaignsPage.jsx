@@ -82,7 +82,7 @@ const EmailCampaignsPage = () => {
 
         {/* Gmail Connection Card */}
         <div className="card" style={{ marginBottom: 24, padding: 32 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24, flexWrap: 'wrap' }}>
             <div style={{
               width: 56, height: 56, borderRadius: 14,
               background: isConnected ? 'rgba(16,185,129,0.1)' : 'rgba(99,102,241,0.1)',
@@ -157,7 +157,7 @@ const EmailCampaignsPage = () => {
         {/* Features Card */}
         <div className="card" style={{ padding: 28 }}>
           <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 20 }}>What you get with Gmail Integration</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+          <div className="form-row form-row-2" style={{ gap: 14 }}>
             {[
               { icon: '📧', title: 'Sent from your Gmail', desc: 'Client receives email from YOUR address, not a no-reply address.' },
               { icon: '📎', title: 'PDF Auto-attached', desc: 'Invoice PDF is automatically generated and attached to the email.' },

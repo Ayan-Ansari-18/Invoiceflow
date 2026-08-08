@@ -75,7 +75,7 @@ const BrandingPage = () => {
         </div>
 
         <div className="card" style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', gap: 24, padding: 24 }}>
+          <div className="form-row form-row-2" style={{ padding: 24 }}>
             <div style={{ flex: 1 }}>
               <h3 style={{ fontSize: 16, color: '#fff', marginBottom: 12 }}>Company Logo</h3>
               <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 16 }}>
