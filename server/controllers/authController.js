@@ -183,7 +183,7 @@ const forgotPassword = async (req, res, next) => {
     `;
 
     try {
-      if (process.env.SMTP_EMAIL && process.env.SMTP_PASSWORD) {
+      if (process.env.RESEND_API_KEY) {
         await sendEmail({
           email: user.email,
           subject: 'InvoiceFlow Password Reset Token',
@@ -191,9 +191,9 @@ const forgotPassword = async (req, res, next) => {
         });
         res.status(200).json({ success: true, message: 'Password reset email sent to your inbox!' });
       } else {
-        // Fallback for when SMTP is not configured yet
+        // Fallback for when Resend is not configured yet
         console.log(`\n\n=== PASSWORD RESET LINK (Fallback) ===\nUser: ${user.email}\nLink: ${resetUrl}\n===========================\n\n`);
-        res.status(200).json({ success: true, message: 'Password reset link generated in logs. SMTP not configured.' });
+        res.status(200).json({ success: true, message: 'Password reset link generated in logs. Resend API Key not configured.' });
       }
     } catch (err) {
       console.error('Error sending email:', err);
