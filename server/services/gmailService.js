@@ -39,6 +39,7 @@ const sendInvoiceEmail = async ({ accessToken, refreshToken, fromEmail, toEmail,
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       refreshToken: refreshToken,
+      accessToken: accessToken,
     },
   });
 
