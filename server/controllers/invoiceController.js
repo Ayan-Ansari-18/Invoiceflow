@@ -60,7 +60,7 @@ const createInvoice = async (req, res, next) => {
 const createBulkInvoices = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
-    const { clientIds, invoiceData } = req.body;
+    const { clientIds, invoiceData, invoiceNumbers = {} } = req.body;
 
     if (!clientIds || !Array.isArray(clientIds) || clientIds.length === 0) {
       return res.status(400).json({ success: false, message: 'No clients provided' });
@@ -81,8 +81,11 @@ const createBulkInvoices = async (req, res, next) => {
 
     const invoices = [];
     for (const client of clients) {
-      user.invoiceCounter += 1;
-      const invoiceNumber = `${user.invoicePrefix}-${String(user.invoiceCounter).padStart(3, '0')}`;
+      let invoiceNumber = invoiceNumbers[client._id?.toString()];
+      if (!invoiceNumber || invoiceNumber.trim() === '') {
+        user.invoiceCounter += 1;
+        invoiceNumber = `${user.invoicePrefix}-${String(user.invoiceCounter).padStart(3, '0')}`;
+      }
       
       invoices.push({
         ...rest,

@@ -79,9 +79,11 @@ const InvoiceFormPage = () => {
     paymentLink: '',
   };
 
-  const bulkClientIds = location.state?.bulkClientIds || null;
+  const bulkClients = location.state?.bulkClients || [];
   const bulkGroupName = location.state?.bulkGroupName || '';
-  const isBulk = Boolean(bulkClientIds && bulkClientIds.length > 0);
+  const isBulk = Boolean(bulkClients && bulkClients.length > 0);
+  const bulkClientIds = bulkClients.map(c => c._id);
+  const [bulkInvoiceNumbers, setBulkInvoiceNumbers] = useState({});
 
   const { register, control, handleSubmit, watch, setValue, reset, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(isBulk ? bulkSchema : schema),
@@ -174,7 +176,11 @@ const InvoiceFormPage = () => {
       const payload = { ...formData, gstPercent, subtotal, totalAdditionalCharges, totalDiscount, gstAmount, total };
 
       if (isBulk) {
-        return api.post('/invoices/bulk', { clientIds: bulkClientIds, invoiceData: payload }).then((r) => r.data);
+        return api.post('/invoices/bulk', { 
+          clientIds: bulkClientIds, 
+          invoiceData: payload,
+          invoiceNumbers: bulkInvoiceNumbers 
+        }).then((r) => r.data);
       }
       if (isEditing) {
         return api.put(`/invoices/${id}`, payload).then((r) => r.data.invoice);
@@ -279,8 +285,24 @@ const InvoiceFormPage = () => {
             <FormSection icon={User} title="Client Details">
               {isBulk ? (
                 <div style={{ padding: '16px', background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '8px' }}>
-                  <p style={{ color: '#fff', fontWeight: 600, marginBottom: '4px' }}>Bulk Invoicing Group: {bulkGroupName}</p>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>This invoice will be duplicated and sent to all {bulkClientIds.length} clients in this group.</p>
+                  <p style={{ color: '#fff', fontWeight: 600, marginBottom: '8px' }}>Bulk Invoicing Group: {bulkGroupName}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginBottom: '16px' }}>Enter a custom invoice number for each client (or leave blank to auto-generate).</p>
+                  
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {bulkClients.map(c => (
+                      <div key={c._id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(0,0,0,0.2)', borderRadius: '6px' }}>
+                        <span style={{ color: '#e5e7eb', fontSize: '14px', fontWeight: 500 }}>{c.name}</span>
+                        <input
+                          type="text"
+                          className="form-input"
+                          style={{ width: '200px', padding: '6px 12px', height: '32px', fontSize: '13px', margin: 0 }}
+                          placeholder="Auto-generated"
+                          value={bulkInvoiceNumbers[c._id] || ''}
+                          onChange={(e) => setBulkInvoiceNumbers({ ...bulkInvoiceNumbers, [c._id]: e.target.value })}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ) : (
                 <>

@@ -137,7 +137,7 @@ const ClientGroupsPage = () => {
                 <Users size={16} /> Manage Clients
               </button>
             )}
-            <button className="btn btn-primary" onClick={() => navigate('/invoices/new', { state: { bulkClientIds: clientIds, bulkGroupName: groupName } })} disabled={analytics.count === 0}>
+              <button className="btn btn-primary" onClick={() => navigate('/invoices/new', { state: { bulkClients: groupClients, bulkGroupName: groupName } })} disabled={analytics.count === 0}>
               <Zap size={16} /> Bulk Invoice
             </button>
           </div>
