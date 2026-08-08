@@ -106,31 +106,37 @@ const sendInvoice = async (req, res) => {
     const clientEmail = invoice.clientSnapshot?.email;
     if (!clientEmail) return res.status(400).json({ success: false, message: 'Client email is missing on this invoice.' });
 
-    // Generate PDF
-    const pdfBuffer = await generateInvoicePDF(invoice, user);
+    // Respond immediately to make the UI feel fast
+    res.json({ success: true, message: `Invoice ${invoice.invoiceNumber} is being sent to ${clientEmail}...` });
 
-    // Send email
-    await sendInvoiceEmail({
-      accessToken: user.gmailAccessToken,
-      refreshToken: user.gmailRefreshToken,
-      fromEmail: user.gmailEmail || user.email,
-      toEmail: clientEmail,
-      toName: invoice.clientSnapshot?.name,
-      invoiceNumber: invoice.invoiceNumber,
-      pdfBuffer,
-      total: invoice.total,
-      currency: invoice.currency,
-      dueDate: invoice.dueDate,
-      businessName: user.businessName,
-    });
+    // Generate PDF and send email in the background
+    (async () => {
+      try {
+        const pdfBuffer = await generateInvoicePDF(invoice, user);
 
-    // Update invoice status to 'sent' if it's a draft
-    if (invoice.status === 'draft') {
-      invoice.status = 'sent';
-      await invoice.save();
-    }
+        await sendInvoiceEmail({
+          accessToken: user.gmailAccessToken,
+          refreshToken: user.gmailRefreshToken,
+          fromEmail: user.gmailEmail || user.email,
+          toEmail: clientEmail,
+          toName: invoice.clientSnapshot?.name,
+          invoiceNumber: invoice.invoiceNumber,
+          pdfBuffer,
+          total: invoice.total,
+          currency: invoice.currency,
+          dueDate: invoice.dueDate,
+          businessName: user.businessName,
+        });
 
-    res.json({ success: true, message: `Invoice ${invoice.invoiceNumber} sent to ${clientEmail}!` });
+        // Update invoice status to 'sent' if it's a draft
+        if (invoice.status === 'draft') {
+          invoice.status = 'sent';
+          await invoice.save();
+        }
+      } catch (bgError) {
+        console.error('Background email sending failed:', bgError);
+      }
+    })();
   } catch (err) {
     console.error('Send invoice error:', err);
     res.status(500).json({ success: false, message: err.message || 'Failed to send email' });
