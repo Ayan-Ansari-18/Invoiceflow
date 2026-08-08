@@ -226,7 +226,7 @@ const InvoiceFormPage = () => {
     }
   };
 
-  const isLimitReached = !isPro && !isEditing && user?.invoiceCounter >= 5;
+  const isLimitReached = !isPro && !isEditing && user?.invoiceCounter >= 50000;
 
   return (
     <AppLayout title={isEditing ? 'Edit Invoice' : 'New Invoice'}>

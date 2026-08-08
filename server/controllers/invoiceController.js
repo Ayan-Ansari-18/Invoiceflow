@@ -19,11 +19,11 @@ const createInvoice = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
 
-    // Enforce 5 invoice limit for free users
-    if (user.plan === 'free' && user.invoiceCounter >= 5) {
+    // Enforce 50000 invoice limit for free users
+    if (user.plan === 'free' && user.invoiceCounter >= 50000) {
       return res.status(403).json({ 
         success: false, 
-        message: 'Free plan limit reached. You can only create up to 5 invoices on the free plan.' 
+        message: 'Free plan limit reached. You can only create up to 50000 invoices on the free plan.' 
       });
     }
 
@@ -66,10 +66,10 @@ const createBulkInvoices = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'No clients provided' });
     }
 
-    if (user.plan === 'free' && (user.invoiceCounter + clientIds.length) > 5) {
+    if (user.plan === 'free' && (user.invoiceCounter + clientIds.length) > 50000) {
       return res.status(403).json({
         success: false,
-        message: `Free plan limit reached. Creating ${clientIds.length} invoices would exceed your 5 invoice limit.`,
+        message: `Free plan limit reached. Creating ${clientIds.length} invoices would exceed your 50000 invoice limit.`,
       });
     }
 

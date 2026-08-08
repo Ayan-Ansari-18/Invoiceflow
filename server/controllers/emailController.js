@@ -106,43 +106,37 @@ const sendInvoice = async (req, res) => {
     const clientEmail = invoice.clientSnapshot?.email;
     if (!clientEmail) return res.status(400).json({ success: false, message: 'Client email is missing on this invoice.' });
 
-    // Respond immediately to make the UI feel fast
-    res.json({ success: true, message: `Invoice ${invoice.invoiceNumber} is being sent to ${clientEmail}...` });
-
-    // Generate PDF and send email in the background
-    (async () => {
+      // Generate PDF and send email synchronously to catch errors
+      let pdfBuffer = null;
       try {
-        let pdfBuffer = null;
-        try {
-          pdfBuffer = await generateInvoicePDF(invoice, user);
-        } catch (pdfErr) {
-          console.error('Failed to generate PDF, sending email without attachment:', pdfErr);
-        }
-
-        await sendInvoiceEmail({
-          accessToken: user.gmailAccessToken,
-          refreshToken: user.gmailRefreshToken,
-          fromEmail: user.gmailEmail || user.email,
-          toEmail: clientEmail,
-          toName: invoice.clientSnapshot?.name,
-          invoiceNumber: invoice.invoiceNumber,
-          pdfBuffer,
-          total: invoice.total,
-          currency: invoice.currency,
-          dueDate: invoice.dueDate,
-          businessName: user.businessName,
-        });
-
-        // Update invoice status to 'sent' if it's a draft
-        if (invoice.status === 'draft') {
-          invoice.status = 'sent';
-          await invoice.save();
-        }
-      } catch (bgError) {
-        console.error('Background email sending failed:', bgError);
-        require('fs').appendFileSync(require('path').join(__dirname, '../email-error.log'), new Date().toISOString() + ': ' + bgError.stack + '\n');
+        pdfBuffer = await generateInvoicePDF(invoice, user);
+      } catch (pdfErr) {
+        console.error('Failed to generate PDF, sending email without attachment:', pdfErr);
       }
-    })();
+
+      await sendInvoiceEmail({
+        accessToken: user.gmailAccessToken,
+        refreshToken: user.gmailRefreshToken,
+        fromEmail: user.gmailEmail || user.email,
+        toEmail: clientEmail,
+        toName: invoice.clientSnapshot?.name,
+        invoiceNumber: invoice.invoiceNumber,
+        pdfBuffer,
+        total: invoice.total,
+        currency: invoice.currency,
+        dueDate: invoice.dueDate,
+        businessName: user.businessName,
+      });
+
+      // Update invoice status to 'sent' if it's a draft
+      if (invoice.status === 'draft') {
+        invoice.status = 'sent';
+        await invoice.save();
+      }
+
+      // Respond with success after sending completes
+      res.json({ success: true, message: `Invoice ${invoice.invoiceNumber} sent successfully to ${clientEmail}!` });
+
   } catch (err) {
     console.error('Send invoice error:', err);
     res.status(500).json({ success: false, message: err.message || 'Failed to send email' });
