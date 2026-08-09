@@ -84,6 +84,11 @@ const InvoiceFormPage = () => {
   const isBulk = Boolean(bulkClients && bulkClients.length > 0);
   const bulkClientIds = bulkClients.map(c => c._id);
   const [bulkInvoiceNumbers, setBulkInvoiceNumbers] = useState({});
+  const [bulkClientCountries, setBulkClientCountries] = useState(() => {
+    const initial = {};
+    bulkClients.forEach(c => initial[c._id] = c.country || 'India');
+    return initial;
+  });
 
   const { register, control, handleSubmit, watch, setValue, reset, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(isBulk ? bulkSchema : schema),
@@ -179,7 +184,8 @@ const InvoiceFormPage = () => {
         return api.post('/invoices/bulk', { 
           clientIds: bulkClientIds, 
           invoiceData: payload,
-          invoiceNumbers: bulkInvoiceNumbers 
+          invoiceNumbers: bulkInvoiceNumbers,
+          clientCountries: bulkClientCountries
         }).then((r) => r.data);
       }
       if (isEditing) {
@@ -290,15 +296,26 @@ const InvoiceFormPage = () => {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {bulkClients.map(c => (
                       <div key={c._id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(0,0,0,0.2)', borderRadius: '6px' }}>
-                        <span style={{ color: '#e5e7eb', fontSize: '14px', fontWeight: 500 }}>{c.name}</span>
-                        <input
-                          type="text"
-                          className="form-input"
-                          style={{ maxWidth: '200px', width: '100%', padding: '6px 12px', height: '32px', fontSize: '13px', margin: 0 }}
-                          placeholder="Auto-generated"
-                          value={bulkInvoiceNumbers[c._id] || ''}
-                          onChange={(e) => setBulkInvoiceNumbers({ ...bulkInvoiceNumbers, [c._id]: e.target.value })}
-                        />
+                        <span style={{ color: '#e5e7eb', fontSize: '14px', fontWeight: 500, flex: 1 }}>{c.name}</span>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <select
+                            className="form-select"
+                            style={{ width: '130px', padding: '6px 10px', height: '32px', fontSize: '12px', margin: 0, backgroundColor: 'rgba(255,255,255,0.05)', color: '#fff' }}
+                            value={bulkClientCountries[c._id] || 'India'}
+                            onChange={(e) => setBulkClientCountries({ ...bulkClientCountries, [c._id]: e.target.value })}
+                          >
+                            <option value="India">Indian Client</option>
+                            <option value="Other">Other Country</option>
+                          </select>
+                          <input
+                            type="text"
+                            className="form-input"
+                            style={{ maxWidth: '160px', width: '100%', padding: '6px 12px', height: '32px', fontSize: '13px', margin: 0 }}
+                            placeholder="Auto-generated"
+                            value={bulkInvoiceNumbers[c._id] || ''}
+                            onChange={(e) => setBulkInvoiceNumbers({ ...bulkInvoiceNumbers, [c._id]: e.target.value })}
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>

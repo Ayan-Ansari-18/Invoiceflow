@@ -56,11 +56,11 @@ const createInvoice = async (req, res, next) => {
   }
 };
 
-// POST /api/invoices/bulk
+  // POST /api/invoices/bulk
 const createBulkInvoices = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
-    const { clientIds, invoiceData, invoiceNumbers = {} } = req.body;
+    const { clientIds, invoiceData, invoiceNumbers = {}, clientCountries = {} } = req.body;
 
     if (!clientIds || !Array.isArray(clientIds) || clientIds.length === 0) {
       return res.status(400).json({ success: false, message: 'No clients provided' });
@@ -73,8 +73,7 @@ const createBulkInvoices = async (req, res, next) => {
       });
     }
 
-    const { lineItems, gstPercent = 18, ...rest } = invoiceData;
-    const { subtotal, gstAmount, total } = calcTotals(lineItems, gstPercent);
+    const { lineItems, gstPercent: defaultGstPercent = 18, ...rest } = invoiceData;
 
     const Client = require('../models/Client');
     const clients = await Client.find({ _id: { $in: clientIds }, userId: user._id });
@@ -87,33 +86,35 @@ const createBulkInvoices = async (req, res, next) => {
         invoiceNumber = `${user.invoicePrefix}-${String(user.invoiceCounter).padStart(3, '0')}`;
       }
       
+      const clientCountry = clientCountries[client._id?.toString()] || client.country || 'India';
+      const effectiveGstPercent = clientCountry === 'India' ? defaultGstPercent : 0;
+      const { subtotal, gstAmount, total } = calcTotals(lineItems, effectiveGstPercent);
+      
       invoices.push({
-        ...rest,
-        invoiceNumber,
         userId: user._id,
         clientId: client._id,
+        invoiceNumber,
+        lineItems,
+        gstPercent: effectiveGstPercent,
+        subtotal,
+        gstAmount,
+        total,
+        ...rest,
         clientSnapshot: {
           name: client.name,
           email: client.email,
           phone: client.phone,
           address: client.address,
           GSTIN: client.GSTIN,
-          country: client.country || 'India',
-        },
-        lineItems,
-        subtotal,
-        gstPercent,
-        gstAmount,
-        total,
+          country: clientCountry
+        }
       });
     }
 
+    await Invoice.insertMany(invoices);
     await user.save();
     
-    // Bulk insert
-    const createdInvoices = await Invoice.insertMany(invoices);
-
-    res.status(201).json({ success: true, count: createdInvoices.length });
+    res.status(201).json({ success: true, count: invoices.length });
   } catch (err) {
     next(err);
   }
