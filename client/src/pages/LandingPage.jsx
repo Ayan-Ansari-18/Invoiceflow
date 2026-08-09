@@ -384,7 +384,54 @@ const LandingPage = () => {
                 </button>
               </motion.div>
             ))}
+            </div>
           </div>
+        </section>
+
+      {/* Purpose Section */}
+      <section style={{ padding: '100px 24px', background: 'linear-gradient(to bottom, transparent, rgba(99, 102, 241, 0.03))', borderTop: '1px solid rgba(255,255,255,0.05)', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '1000px', height: '100%', background: 'radial-gradient(ellipse at top, rgba(99, 102, 241, 0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        
+        <div className="container" style={{ maxWidth: '760px', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <div style={{ 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: 8, 
+              padding: '6px 16px', 
+              borderRadius: 30, 
+              background: 'rgba(99, 102, 241, 0.1)', 
+              color: '#a5b4fc', 
+              fontSize: '13px', 
+              fontWeight: 600, 
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase',
+              marginBottom: 24 
+            }}>
+              Our Mission
+            </div>
+            
+            <h2 style={{ fontSize: '2.5rem', marginBottom: '32px', fontWeight: 700, letterSpacing: '-0.5px' }}>
+              Why We Built <span style={{ color: '#818cf8' }}>InvoiceFlow</span>
+            </h2>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', color: '#cbd5e1', fontSize: '1.15rem', lineHeight: '1.8', fontWeight: 400 }}>
+              <p>
+                Being a freelancer in India is tough enough without having to stress over formatting invoices, calculating GST, and awkwardly chasing clients for payments. We know, because we've been there.
+              </p>
+              <p>
+                We built InvoiceFlow with one simple purpose: <strong>to give independent creators a tool that makes them look highly professional from day one.</strong> You shouldn't need an accounting degree or clunky, expensive enterprise software just to send a basic bill.
+              </p>
+              <p>
+                Our goal is to handle all the boring paperwork—the tax math, generating PDFs, and sending emails—so you can spend 100% of your time focusing on the work you actually love doing.
+              </p>
+            </div>
+          </motion.div>
         </div>
       </section>
 
