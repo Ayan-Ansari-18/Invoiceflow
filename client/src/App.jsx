@@ -34,6 +34,8 @@ import DocumentationPage from './pages/DocumentationPage';
 import BlogPage from './pages/BlogPage';
 import CommunityPage from './pages/CommunityPage';
 
+import FAQBot from './components/ui/FAQBot';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, staleTime: 30_000 },
@@ -51,6 +53,7 @@ const App = () => {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
+          <FAQBot />
           <Routes>
           {/* Public */}
           <Route path="/" element={<LandingPage />} />
