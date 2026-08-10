@@ -538,13 +538,13 @@ p { color: var(--text-muted); line-height: 1.6; }
 }
 /* Beautiful animated background blurs */
 .auth-page::before, .auth-page::after {
-  content: ''; position: absolute; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0;
+  content: ''; position: absolute; border-radius: 50%; pointer-events: none; z-index: 0;
 }
 .auth-page::before {
-  top: -20%; left: -10%; width: 60vw; height: 60vw; background: rgba(79, 70, 229, 0.15); animation: float 10s ease-in-out infinite;
+  top: -20%; left: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, rgba(79, 70, 229, 0.15) 0%, transparent 70%); animation: float 10s ease-in-out infinite;
 }
 .auth-page::after {
-  bottom: -20%; right: -10%; width: 50vw; height: 50vw; background: rgba(147, 51, 234, 0.15); animation: float 12s ease-in-out infinite reverse;
+  bottom: -20%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(147, 51, 234, 0.15) 0%, transparent 70%); animation: float 12s ease-in-out infinite reverse;
 }
 .auth-card {
   width: 100%; max-width: 440px; padding: 48px; position: relative; z-index: 1;
