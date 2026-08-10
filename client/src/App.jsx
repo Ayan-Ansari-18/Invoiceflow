@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
-import React, { useEffect, Suspense, lazy } from 'react';
+import React, { useEffect } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 
 import AuthGuard from './components/layout/AuthGuard';
@@ -9,31 +9,30 @@ import OnboardingGuard from './components/layout/OnboardingGuard';
 import AdminGuard from './components/layout/AdminGuard';
 import useAuthStore from './store/authStore';
 
-// Lazy loaded Pages
-const LandingPage = lazy(() => import('./pages/LandingPage'));
-const LoginPage = lazy(() => import('./pages/LoginPage'));
-const RegisterPage = lazy(() => import('./pages/RegisterPage'));
-const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
-const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
-const DashboardPage = lazy(() => import('./pages/DashboardPage'));
-const InvoiceListPage = lazy(() => import('./pages/InvoiceListPage'));
-const InvoiceFormPage = lazy(() => import('./pages/InvoiceFormPage'));
-const InvoiceDetailPage = lazy(() => import('./pages/InvoiceDetailPage'));
-const ClientsPage = lazy(() => import('./pages/ClientsPage'));
-const ProfilePage = lazy(() => import('./pages/ProfilePage'));
-const EmailCampaignsPage = lazy(() => import('./pages/EmailCampaignsPage'));
-const BrandingPage = lazy(() => import('./pages/BrandingPage'));
-const ClientGroupsPage = lazy(() => import('./pages/ClientGroupsPage'));
-const OnboardingPage = lazy(() => import('./pages/OnboardingPage'));
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
-const AdminLogin = lazy(() => import('./pages/AdminLogin'));
-const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'));
-const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'));
-const ChangelogPage = lazy(() => import('./pages/ChangelogPage'));
-const DocumentationPage = lazy(() => import('./pages/DocumentationPage'));
-const BlogPage = lazy(() => import('./pages/BlogPage'));
-const CommunityPage = lazy(() => import('./pages/CommunityPage'));
-
+// Static Pages (Instant Load)
+import LandingPage from './pages/LandingPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import DashboardPage from './pages/DashboardPage';
+import InvoiceListPage from './pages/InvoiceListPage';
+import InvoiceFormPage from './pages/InvoiceFormPage';
+import InvoiceDetailPage from './pages/InvoiceDetailPage';
+import ClientsPage from './pages/ClientsPage';
+import ProfilePage from './pages/ProfilePage';
+import EmailCampaignsPage from './pages/EmailCampaignsPage';
+import BrandingPage from './pages/BrandingPage';
+import ClientGroupsPage from './pages/ClientGroupsPage';
+import OnboardingPage from './pages/OnboardingPage';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminLogin from './pages/AdminLogin';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/TermsOfServicePage';
+import ChangelogPage from './pages/ChangelogPage';
+import DocumentationPage from './pages/DocumentationPage';
+import BlogPage from './pages/BlogPage';
+import CommunityPage from './pages/CommunityPage';
 import FAQBot from './components/ui/FAQBot';
 
 const queryClient = new QueryClient({
@@ -46,7 +45,7 @@ const App = () => {
   const initAuth = useAuthStore((s) => s.initAuth);
 
   useEffect(() => {
-    initAuth(); // Restore token from localStorage on mount
+    initAuth();
   }, []);
 
   return (
@@ -54,7 +53,6 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <FAQBot />
-          <Suspense fallback={<div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', color: '#8b5cf6' }}>Loading...</div>}>
             <Routes>
               {/* Public */}
               <Route path="/" element={<LandingPage />} />
@@ -93,7 +91,6 @@ const App = () => {
               {/* Catch All */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-          </Suspense>
         </BrowserRouter>
 
         <Toaster
