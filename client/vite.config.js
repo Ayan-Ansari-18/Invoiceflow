@@ -12,16 +12,4 @@ export default defineConfig({
       },
     },
   },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['framer-motion', 'lucide-react', 'react-hot-toast'],
-          utils: ['axios', 'zod', 'zustand', '@tanstack/react-query'],
-          pdf: ['jspdf', 'html2canvas']
-        }
-      }
-    }
-  }
 })
