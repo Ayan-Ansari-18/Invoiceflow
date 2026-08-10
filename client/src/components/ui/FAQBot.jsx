@@ -39,12 +39,6 @@ const FAQBot = () => {
   const messagesEndRef = useRef(null);
   const location = useLocation();
 
-  // Hide on auth pages
-  const hiddenPaths = ['/login', '/register', '/forgot-password', '/reset-password', '/onboarding', '/super-admin-secret-dashboard'];
-  if (hiddenPaths.some(p => location.pathname.includes(p))) {
-    return null;
-  }
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -54,6 +48,12 @@ const FAQBot = () => {
       setTimeout(() => scrollToBottom(), 100);
     }
   }, [messages, isOpen]);
+
+  // Hide on auth pages
+  const hiddenPaths = ['/login', '/register', '/forgot-password', '/reset-password', '/onboarding', '/super-admin-secret-dashboard'];
+  if (hiddenPaths.some(p => location.pathname.includes(p))) {
+    return null;
+  }
 
   const handleOptionClick = (faq) => {
     setShowOptions(false);
